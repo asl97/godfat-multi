@@ -144,10 +144,6 @@ export default function TrackContainer({
   hoveredCell: CellData;
   setHoveredCell: (cell: CellData) => void;
 }) {
-  if (configData.bannerData.length === 0) {
-    return <Fragment />;
-  }
-
   const urls = configData.bannerData.map((datum) => datum.url);
   const [parsedQueryData, setParsedQueryData] = React.useState<CatCell[][]>([]);
 
@@ -179,6 +175,9 @@ export default function TrackContainer({
     return () => {};
   }, [allQueriesResolved, queries.length]);
 
+  if (configData.bannerData.length !== parsedQueryData.length) {
+    return <Fragment />;
+  }
   if (parsedQueryData.length === 0) {
     return <Fragment />;
   }
