@@ -64,6 +64,54 @@ export default function ConfigContainer({
   >([]);
 
   useEffect(() => {
+    if (eventsQuery?.isSuccess) {
+      if (sessionStorage.getItem("seed")) {
+        setSeed(sessionStorage.getItem("seed")!);
+      }
+      if (sessionStorage.getItem("overrideSeeds")) {
+        setOverrideSeeds(
+          sessionStorage.getItem("overrideSeeds") === "true" ? true : false
+        );
+      }
+    }
+  }, [eventsQuery?.isSuccess]);
+
+  useEffect(() => {
+    if (eventsQuery?.isSuccess) {
+      sessionStorage.setItem("seed", seed);
+    }
+  }, [seed, eventsQuery?.isSuccess]);
+
+  useEffect(() => {
+    if (eventsQuery?.isSuccess) {
+      sessionStorage.setItem("overrideSeeds", overrideSeeds.toString());
+    }
+  }, [overrideSeeds, eventsQuery?.isSuccess]);
+
+  useEffect(() => {
+    if (bannerSelectOptions.length > 0) {
+      if (sessionStorage.getItem("inputKeys")) {
+        const inputKeys = JSON.parse(sessionStorage.getItem("inputKeys")!);
+        setInputs(
+          inputKeys.map((key: string) => ({
+            key,
+            value: { label: "", url: "" },
+          }))
+        );
+      }
+    }
+  }, [bannerSelectOptions]);
+
+  useEffect(() => {
+    if (bannerSelectOptions.length > 0) {
+      sessionStorage.setItem(
+        "inputKeys",
+        JSON.stringify(inputs.map(({ key }) => key))
+      );
+    }
+  }, [inputs.length, bannerSelectOptions]);
+
+  useEffect(() => {
     const parseQueryResult = async () => {
       if (!eventsQuery?.data) return;
       const dataText = await eventsQuery.data.text();

@@ -46,11 +46,39 @@ export default function UrlInput({
   const [customName, setCustomName] = React.useState<string>("");
 
   useEffect(() => {
-    setSelectedBanner(bannerSelectOptions[0].options[0].value);
-    setNumFutureUbers(0);
+    if (sessionStorage.getItem(`${id}:inputType`)) {
+      setInputType(
+        sessionStorage.getItem(`${id}:inputType`) as "select" | "input"
+      );
+    }
+    if (sessionStorage.getItem(`${id}:selectedBanner`)) {
+      setSelectedBanner(
+        sessionStorage.getItem(`${id}:selectedBanner`) as string
+      );
+    } else {
+      setSelectedBanner(bannerSelectOptions[0].options[0].value);
+    }
+    if (sessionStorage.getItem(`${id}:numFutureUbers`)) {
+      setNumFutureUbers(
+        parseInt(sessionStorage.getItem(`${id}:numFutureUbers`) as string)
+      );
+    } else {
+      setNumFutureUbers(0);
+    }
+    if (sessionStorage.getItem(`${id}:inputUrl`)) {
+      setInputUrl(sessionStorage.getItem(`${id}:inputUrl`) as string);
+    }
+    if (sessionStorage.getItem(`${id}:customName`)) {
+      setCustomName(sessionStorage.getItem(`${id}:customName`) as string);
+    }
   }, []);
 
   useEffect(() => {
+    sessionStorage.setItem(`${id}:inputType`, inputType);
+    sessionStorage.setItem(`${id}:selectedBanner`, selectedBanner);
+    sessionStorage.setItem(`${id}:numFutureUbers`, numFutureUbers.toString());
+    sessionStorage.setItem(`${id}:inputUrl`, inputUrl);
+    sessionStorage.setItem(`${id}:customName`, customName);
     if (inputType === "input") {
       setSelfValue({
         label: customName,
@@ -67,7 +95,7 @@ export default function UrlInput({
         url: baseUrl.toString(),
       });
     }
-  }, [selectedBanner, numFutureUbers, inputUrl, customName]);
+  }, [inputType, selectedBanner, numFutureUbers, inputUrl, customName]);
 
   return (
     <Container>
