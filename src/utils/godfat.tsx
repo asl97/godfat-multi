@@ -156,6 +156,15 @@ export const sortGodfatUrlQueryParams = (url: string) => {
     .split("&")
     .map((param) => param.split("=")[0]);
   const urlObj = new URL(url);
+
+  if (
+    urlObj.searchParams.has("event") &&
+    urlObj.searchParams.get("event") === "2023-09-20_769"
+  ) {
+    // I have no idea why but godfat strips this param from the URL in this specific case. Just copy what they do...
+    urlObj.searchParams.delete("event");
+  }
+
   const updatedParams = [];
   for (const param of correctOrderQueryParams) {
     if (urlObj.searchParams.has(param)) {
