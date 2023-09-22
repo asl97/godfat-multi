@@ -5,7 +5,6 @@ import { ConfigData } from "./Page";
 
 export type CellData = {
   row: string;
-  text?: string;
   target?: string;
 };
 

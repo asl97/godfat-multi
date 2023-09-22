@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useGodfatQuery } from "./utils/godfat";
+import { sortGodfatUrlQueryParams, useGodfatQuery } from "./utils/godfat";
 import UrlInput, { BannerSelectOption } from "./UrlInput";
 import {
   Button,
@@ -114,7 +114,7 @@ export default function ConfigContainer({
       }
       return {
         label: value.label,
-        url: baseUrl.toString(),
+        url: sortGodfatUrlQueryParams(baseUrl.toString()),
       };
     });
     setConfigData({ bannerData });

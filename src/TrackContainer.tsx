@@ -22,13 +22,13 @@ const zip = (arr: any[]) =>
     .map((_, i) => arr.map((a) => a[i]));
 
 const parseTargetFromText = (text: string | null): string => {
-  const pattern = "\\d+[a-zA-Z]+";
-  const regex = new RegExp(pattern, "g");
-  const matches = text?.match(regex);
-  if (!matches) {
-    return "";
+  if (text?.endsWith("A") || text?.endsWith("B")) {
+    return text.slice(text.indexOf(">") + 2);
   }
-  return matches[0];
+  if (text?.startsWith("<")) {
+    return text.split(" ")[1];
+  }
+  return "";
 };
 
 const removePickAndCatFromClass = (className: string): string => {
@@ -150,7 +150,7 @@ export default function TrackContainer({
   const queries = useQueries(
     urls.map((url) => ({
       queryKey: [url],
-      queryFn: () => fetch(url),
+      queryFn: () => fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`),
       staleTime: Infinity,
     }))
   );
@@ -246,7 +246,6 @@ export default function TrackContainer({
                               : catCell.mainCat;
                             setHoveredCell({
                               row: rowLabel,
-                              text: Boolean(text) ? text : bottomText,
                               target: Boolean(text)
                                 ? parseTargetFromText(text)
                                 : parseTargetFromText(bottomText),
@@ -269,7 +268,6 @@ export default function TrackContainer({
                                 : catCell.guaranteeMainCat;
                               setHoveredCell({
                                 row: rowLabel,
-                                text: Boolean(text) ? text : bottomText,
                                 target: Boolean(text)
                                   ? parseTargetFromText(text)
                                   : parseTargetFromText(bottomText),
@@ -302,7 +300,6 @@ export default function TrackContainer({
                               : catCell.mainCat;
                             setHoveredCell({
                               row: rowLabel,
-                              text: text || "",
                               target: parseTargetFromText(text),
                             });
                           }}
@@ -320,7 +317,6 @@ export default function TrackContainer({
                                 : catCell.guaranteeMainCat;
                               setHoveredCell({
                                 row: rowLabel,
-                                text: text || "",
                                 target: parseTargetFromText(text),
                               });
                             }}

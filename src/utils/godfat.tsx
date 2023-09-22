@@ -148,6 +148,25 @@ export const isGodfatUrl = (url: string) => {
   }
 };
 
+export const sortGodfatUrlQueryParams = (url: string) => {
+  // The query params must be sorted in this exact order, otherwise we get 302'd which messes with the CORS proxy
+  const exampleGodfatUrl =
+    "seed=573767108&last=706&event=2023-08-25_815&lang=tw&version=8.5&name=1&theme=mkweb&count=200&find=699&force_guaranteed=7&ubers=2&details=true";
+  const correctOrderQueryParams = exampleGodfatUrl
+    .split("&")
+    .map((param) => param.split("=")[0]);
+  const urlObj = new URL(url);
+  const updatedParams = [];
+  for (const param of correctOrderQueryParams) {
+    if (urlObj.searchParams.has(param)) {
+      const value = urlObj.searchParams.get(param);
+      updatedParams.push([`${param}=${value}`]);
+    }
+  }
+  const sortedUpdatedParams = `/?${updatedParams.join("&")}`;
+  return `${urlObj.origin}${sortedUpdatedParams}`;
+};
+
 export const useGodfatQuery = (page: string) => {
   if (new URL(page).hostname !== "bc.godfat.org") {
     return {
@@ -158,7 +177,7 @@ export const useGodfatQuery = (page: string) => {
 
   const query = useQuery({
     queryKey: [page],
-    queryFn: () => fetch(page),
+    queryFn: () => fetch(`https://corsproxy.io/?${encodeURIComponent(page)}`),
     staleTime: Infinity,
   });
 
