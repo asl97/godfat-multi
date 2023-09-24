@@ -154,6 +154,11 @@ export default function ConfigContainer({
   };
 
   const onSubmit = () => {
+    // Godfat strips the event param from the URL if the event is the first non-plat banner, see
+    // https://gitlab.com/godfat/battle-cats-rolls/-/blob/master/lib/battle-cats-rolls/route.rb?ref_type=heads#L468
+    // Assume the first non-plat is in the "upcoming" (optgroup 1) as entry 3 (the first 2 are plat/legend)
+    const firstNonPlatBanner =
+      bannerSelectOptions?.[0].options?.[2].value || "";
     const bannerData = inputs.map(({ value }) => {
       const baseUrl = new URL(value.url);
       // Selecting a banner will construct a URL without a seed, so just do it here
@@ -162,7 +167,7 @@ export default function ConfigContainer({
       }
       return {
         label: value.label,
-        url: sortGodfatUrlQueryParams(baseUrl.toString()),
+        url: sortGodfatUrlQueryParams(baseUrl.toString(), firstNonPlatBanner),
       };
     });
     setConfigData({ bannerData });

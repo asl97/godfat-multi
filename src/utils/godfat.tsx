@@ -148,7 +148,10 @@ export const isGodfatUrl = (url: string) => {
   }
 };
 
-export const sortGodfatUrlQueryParams = (url: string) => {
+export const sortGodfatUrlQueryParams = (
+  url: string,
+  firstNonPlatBanner: string
+) => {
   // The query params must be sorted in this exact order, otherwise we get 302'd which messes with the CORS proxy
   const exampleGodfatUrl =
     "seed=573767108&last=706&event=2023-08-25_815&lang=tw&version=8.5&name=1&theme=mkweb&count=200&find=699&force_guaranteed=7&ubers=2&details=true";
@@ -159,9 +162,8 @@ export const sortGodfatUrlQueryParams = (url: string) => {
 
   if (
     urlObj.searchParams.has("event") &&
-    urlObj.searchParams.get("event") === "2023-09-20_769"
+    urlObj.searchParams.get("event") === firstNonPlatBanner
   ) {
-    // I have no idea why but godfat strips this param from the URL in this specific case. Just copy what they do...
     urlObj.searchParams.delete("event");
   }
 
