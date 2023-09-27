@@ -153,11 +153,32 @@ export const sortGodfatUrlQueryParams = (
   firstNonPlatBanner: string
 ) => {
   // The query params must be sorted in this exact order, otherwise we get 302'd which messes with the CORS proxy
-  const exampleGodfatUrl =
-    "seed=573767108&last=706&event=2023-08-25_815&lang=tw&version=8.5&name=1&theme=mkweb&count=200&find=699&force_guaranteed=7&ubers=2&details=true";
-  const correctOrderQueryParams = exampleGodfatUrl
-    .split("&")
-    .map((param) => param.split("=")[0]);
+  // See https://gitlab.com/godfat/battle-cats-rolls/-/blob/master/lib/battle-cats-rolls/route.rb?ref_type=heads#L428-436
+  const correctOrderQueryParams = [
+    "seed",
+    "last",
+    "event",
+    "custom",
+    "rate",
+    "c_rare",
+    "c_supa",
+    "c_uber",
+    "level",
+    "lang",
+    "version",
+    "name",
+    "theme",
+    "count",
+    "find",
+    "no_guaranteed",
+    "force_guaranteed",
+    "ubers",
+    "details",
+    "hide_wave",
+    "sum_no_wave",
+    "dps_no_critical",
+    "o",
+  ];
   const urlObj = new URL(url);
 
   if (
@@ -175,6 +196,7 @@ export const sortGodfatUrlQueryParams = (
     }
   }
   const sortedUpdatedParams = `/?${updatedParams.join("&")}`;
+  console.log(sortedUpdatedParams);
   return `${urlObj.origin}${sortedUpdatedParams}`;
 };
 
