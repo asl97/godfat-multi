@@ -158,7 +158,11 @@ export default function ConfigContainer({
     // https://gitlab.com/godfat/battle-cats-rolls/-/blob/master/lib/battle-cats-rolls/route.rb?ref_type=heads#L468
     // Assume the first non-plat is in the "upcoming" (optgroup 1) as entry 3 (the first 2 are plat/legend)
     const firstNonPlatBanner =
-      bannerSelectOptions?.[0].options?.[2].value || "";
+      bannerSelectOptions?.[0].options?.find(
+        (o) =>
+          !o.label.toLowerCase().includes("platinum capsules") &&
+          !o.label.toLowerCase().includes("legend capsules")
+      )?.value || "";
     const bannerData = inputs.map(({ value }) => {
       const baseUrl = new URL(value.url);
       // Selecting a banner will construct a URL without a seed, so just do it here
