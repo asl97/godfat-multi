@@ -14,13 +14,13 @@ import {
 } from "@mui/material";
 import styled from "@emotion/styled";
 import { BannerData, ConfigData } from "./Page";
+import {
+  useStorageLinkedBoolean,
+  useStorageLinkedInputs,
+  useStorageLinkedString,
+} from "./utils/config";
 
 const generateKey = () => Math.random().toString(36).substring(7);
-
-type UrlInputData = {
-  key: string;
-  value: BannerData;
-};
 
 const parseBannersFromHtml = (html: Document): BannerSelectOption[] => {
   const eventSelect = html.getElementById("event_select");
@@ -58,53 +58,13 @@ export default function ConfigContainer({
   banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
 }) {
-  console.log(banners);
-  const [seed, setSeed] = React.useState<string>("");
-  const [overrideSeeds, setOverrideSeeds] = React.useState<boolean>(true);
-  const [inputs, setInputs] = React.useState<UrlInputData[]>([]);
+  const [seed, setSeed] = useStorageLinkedString("seed");
+  const [overrideSeeds, setOverrideSeeds] =
+    useStorageLinkedBoolean("overrideSeeds");
+  const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
 
   // Will be scraped from godfat
   const bannerSelectOptions = banners;
-
-  // if (sessionStorage.getItem("seed")) {
-  //   setSeed(sessionStorage.getItem("seed")!);
-  // }
-  // if (sessionStorage.getItem("overrideSeeds")) {
-  //   setOverrideSeeds(
-  //     sessionStorage.getItem("overrideSeeds") === "true" ? true : false
-  //   );
-  // }
-
-  // useEffect(() => {
-  //   sessionStorage.setItem("seed", seed);
-  // }, [seed]);
-
-  // useEffect(() => {
-  //   sessionStorage.setItem("overrideSeeds", overrideSeeds.toString());
-  // }, [overrideSeeds]);
-
-  // useEffect(() => {
-  //   if (bannerSelectOptions.length > 0) {
-  //     if (sessionStorage.getItem("inputKeys")) {
-  //       const inputKeys = JSON.parse(sessionStorage.getItem("inputKeys")!);
-  //       setInputs(
-  //         inputKeys.map((key: string) => ({
-  //           key,
-  //           value: { label: "", url: "" },
-  //         }))
-  //       );
-  //     }
-  //   }
-  // }, [bannerSelectOptions]);
-
-  // useEffect(() => {
-  //   if (bannerSelectOptions.length > 0) {
-  //     sessionStorage.setItem(
-  //       "inputKeys",
-  //       JSON.stringify(inputs.map(({ key }) => key))
-  //     );
-  //   }
-  // }, [inputs.length, bannerSelectOptions]);
 
   const addNewInput = () => {
     setInputs((inputs) => [

@@ -9,6 +9,7 @@ import ToggleButton from "@mui/material/ToggleButton/ToggleButton";
 import { DeleteForever, List, TextFields } from "@mui/icons-material";
 import styled from "@emotion/styled";
 import { BannerData } from "./Page";
+import { useStorageLinkedNumber, useStorageLinkedString } from "./utils/config";
 
 const Container = styled.div`
   display: flex;
@@ -29,48 +30,19 @@ export default function UrlInput({
   removeSelf: () => void;
   setSelfValue: (value: BannerData) => void;
 }) {
-  const [inputType, setInputType] = React.useState<"select" | "input">(
-    "select"
+  const [inputType, setInputType] = useStorageLinkedString(`${id}:inputType`);
+  const [selectedBanner, setSelectedBanner] = useStorageLinkedString(
+    `${id}:selectedBanner`
   );
-  const [selectedBanner, setSelectedBanner] = React.useState<string>("");
-  const [numFutureUbers, setNumFutureUbers] = React.useState<number>(0);
-  const [inputUrl, setInputUrl] = React.useState<string>("");
-  const [customName, setCustomName] = React.useState<string>("");
+  const [numFutureUbers, setNumFutureUbers] = useStorageLinkedNumber(
+    `${id}:numFutureUbers`
+  );
+  const [inputUrl, setInputUrl] = useStorageLinkedString(`${id}:inputUrl`);
+  const [customName, setCustomName] = useStorageLinkedString(
+    `${id}:customName`
+  );
 
   useEffect(() => {
-    if (sessionStorage.getItem(`${id}:inputType`)) {
-      setInputType(
-        sessionStorage.getItem(`${id}:inputType`) as "select" | "input"
-      );
-    }
-    if (sessionStorage.getItem(`${id}:selectedBanner`)) {
-      setSelectedBanner(
-        sessionStorage.getItem(`${id}:selectedBanner`) as string
-      );
-    } else {
-      setSelectedBanner(bannerSelectOptions[0].options[0].value);
-    }
-    if (sessionStorage.getItem(`${id}:numFutureUbers`)) {
-      setNumFutureUbers(
-        parseInt(sessionStorage.getItem(`${id}:numFutureUbers`) as string)
-      );
-    } else {
-      setNumFutureUbers(0);
-    }
-    if (sessionStorage.getItem(`${id}:inputUrl`)) {
-      setInputUrl(sessionStorage.getItem(`${id}:inputUrl`) as string);
-    }
-    if (sessionStorage.getItem(`${id}:customName`)) {
-      setCustomName(sessionStorage.getItem(`${id}:customName`) as string);
-    }
-  }, []);
-
-  useEffect(() => {
-    sessionStorage.setItem(`${id}:inputType`, inputType);
-    sessionStorage.setItem(`${id}:selectedBanner`, selectedBanner);
-    sessionStorage.setItem(`${id}:numFutureUbers`, numFutureUbers.toString());
-    sessionStorage.setItem(`${id}:inputUrl`, inputUrl);
-    sessionStorage.setItem(`${id}:customName`, customName);
     if (inputType === "input") {
       setSelfValue({
         label: customName,
