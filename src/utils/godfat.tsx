@@ -1,5 +1,65 @@
 import { css } from "@emotion/react";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import { corsUrl } from "./query";
+
+export type BannerSelectOption = {
+  groupLabel: string;
+  options: {
+    value: string;
+    label: string;
+  }[];
+};
+
+const parseBannersFromHtml = (html: Document): BannerSelectOption[] => {
+  const eventSelect = html.getElementById("event_select");
+  if (!eventSelect) return [];
+
+  const results = [];
+  for (const optGroup of eventSelect.children) {
+    if ((optGroup as HTMLOptGroupElement).label === "Custom:") {
+      continue;
+    }
+
+    results.push({
+      groupLabel: (optGroup as HTMLOptGroupElement).label,
+      options: Array.from(optGroup.children).map((option) => ({
+        value: (option as HTMLOptionElement).value,
+        label: (option as HTMLOptionElement).text,
+      })),
+    });
+  }
+
+  return results;
+};
+
+export const useGodfatBanners = () => {
+  const BASE_GODFAT_URL = "https://bc.godfat.org/";
+
+  const [banners, setBanners] = useState<BannerSelectOption[]>([]);
+  const bannerQuery = useQuery({
+    queryKey: [BASE_GODFAT_URL],
+    queryFn: () => fetch(corsUrl(BASE_GODFAT_URL)),
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (banners.length === 0 && bannerQuery?.data) {
+      (async () => {
+        const dataText = await bannerQuery.data.text();
+        const dataDom = new DOMParser().parseFromString(dataText, "text/html");
+        const parsedBanners = parseBannersFromHtml(dataDom);
+        setBanners(parsedBanners);
+      })();
+    }
+  }, [bannerQuery]);
+
+  return {
+    isLoading: bannerQuery.isLoading || banners.length === 0,
+    isError: bannerQuery.isError || banners.length === 0,
+    banners,
+  };
+};
 
 // Mostly copied from godfat HTML
 export const godfatCss = css`

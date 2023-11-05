@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { isGodfatUrl } from "./utils/godfat";
+import { BannerSelectOption, isGodfatUrl } from "./utils/godfat";
 
 import { FormControl, IconButton, InputLabel, Select } from "@mui/material";
 import TextField from "@mui/material/TextField/TextField";
@@ -9,14 +9,6 @@ import ToggleButton from "@mui/material/ToggleButton/ToggleButton";
 import { DeleteForever, List, TextFields } from "@mui/icons-material";
 import styled from "@emotion/styled";
 import { BannerData } from "./Page";
-
-export type BannerSelectOption = {
-  groupLabel: string;
-  options: {
-    value: string;
-    label: string;
-  }[];
-};
 
 const Container = styled.div`
   display: flex;

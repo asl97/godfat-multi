@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
-import { sortGodfatUrlQueryParams, useGodfatQuery } from "./utils/godfat";
-import UrlInput, { BannerSelectOption } from "./UrlInput";
+import {
+  BannerSelectOption,
+  sortGodfatUrlQueryParams,
+  useGodfatQuery,
+} from "./utils/godfat";
+import UrlInput from "./UrlInput";
 import {
   Button,
   Checkbox,
@@ -48,88 +52,59 @@ const Row = styled.div`
 `;
 
 export default function ConfigContainer({
+  banners,
   setConfigData,
 }: {
+  banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
 }) {
-  const { query: eventsQuery } = useGodfatQuery("https://bc.godfat.org/");
-
+  console.log(banners);
   const [seed, setSeed] = React.useState<string>("");
   const [overrideSeeds, setOverrideSeeds] = React.useState<boolean>(true);
   const [inputs, setInputs] = React.useState<UrlInputData[]>([]);
 
   // Will be scraped from godfat
-  const [bannerSelectOptions, setBannerSelectOptions] = React.useState<
-    BannerSelectOption[]
-  >([]);
+  const bannerSelectOptions = banners;
 
-  useEffect(() => {
-    if (eventsQuery?.isSuccess) {
-      if (sessionStorage.getItem("seed")) {
-        setSeed(sessionStorage.getItem("seed")!);
-      }
-      if (sessionStorage.getItem("overrideSeeds")) {
-        setOverrideSeeds(
-          sessionStorage.getItem("overrideSeeds") === "true" ? true : false
-        );
-      }
-    }
-  }, [eventsQuery?.isSuccess]);
+  // if (sessionStorage.getItem("seed")) {
+  //   setSeed(sessionStorage.getItem("seed")!);
+  // }
+  // if (sessionStorage.getItem("overrideSeeds")) {
+  //   setOverrideSeeds(
+  //     sessionStorage.getItem("overrideSeeds") === "true" ? true : false
+  //   );
+  // }
 
-  useEffect(() => {
-    if (eventsQuery?.isSuccess) {
-      sessionStorage.setItem("seed", seed);
-    }
-  }, [seed, eventsQuery?.isSuccess]);
+  // useEffect(() => {
+  //   sessionStorage.setItem("seed", seed);
+  // }, [seed]);
 
-  useEffect(() => {
-    if (eventsQuery?.isSuccess) {
-      sessionStorage.setItem("overrideSeeds", overrideSeeds.toString());
-    }
-  }, [overrideSeeds, eventsQuery?.isSuccess]);
+  // useEffect(() => {
+  //   sessionStorage.setItem("overrideSeeds", overrideSeeds.toString());
+  // }, [overrideSeeds]);
 
-  useEffect(() => {
-    if (bannerSelectOptions.length > 0) {
-      if (sessionStorage.getItem("inputKeys")) {
-        const inputKeys = JSON.parse(sessionStorage.getItem("inputKeys")!);
-        setInputs(
-          inputKeys.map((key: string) => ({
-            key,
-            value: { label: "", url: "" },
-          }))
-        );
-      }
-    }
-  }, [bannerSelectOptions]);
+  // useEffect(() => {
+  //   if (bannerSelectOptions.length > 0) {
+  //     if (sessionStorage.getItem("inputKeys")) {
+  //       const inputKeys = JSON.parse(sessionStorage.getItem("inputKeys")!);
+  //       setInputs(
+  //         inputKeys.map((key: string) => ({
+  //           key,
+  //           value: { label: "", url: "" },
+  //         }))
+  //       );
+  //     }
+  //   }
+  // }, [bannerSelectOptions]);
 
-  useEffect(() => {
-    if (bannerSelectOptions.length > 0) {
-      sessionStorage.setItem(
-        "inputKeys",
-        JSON.stringify(inputs.map(({ key }) => key))
-      );
-    }
-  }, [inputs.length, bannerSelectOptions]);
-
-  useEffect(() => {
-    const parseQueryResult = async () => {
-      if (!eventsQuery?.data) return;
-      const dataText = await eventsQuery.data.text();
-      const dataDom = new DOMParser().parseFromString(dataText, "text/html");
-      const parsedBanners = parseBannersFromHtml(dataDom);
-      setBannerSelectOptions(parsedBanners);
-    };
-    parseQueryResult();
-
-    return () => {};
-  }, [eventsQuery?.data]);
-
-  if (eventsQuery?.isLoading) {
-    return <Typography variant="h5">Loading banner data...</Typography>;
-  }
-  if (eventsQuery?.isError) {
-    return <Typography variant="h5">Error fetching banner data!</Typography>;
-  }
+  // useEffect(() => {
+  //   if (bannerSelectOptions.length > 0) {
+  //     sessionStorage.setItem(
+  //       "inputKeys",
+  //       JSON.stringify(inputs.map(({ key }) => key))
+  //     );
+  //   }
+  // }, [inputs.length, bannerSelectOptions]);
 
   const addNewInput = () => {
     setInputs((inputs) => [
