@@ -35,9 +35,6 @@ export default function ConfigContainer({
     useStorageLinkedBoolean("overrideSeeds");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
 
-  // Will be scraped from godfat
-  const bannerSelectOptions = banners;
-
   const addNewInput = () => {
     setInputs((inputs) => [
       ...inputs,
@@ -70,7 +67,7 @@ export default function ConfigContainer({
       });
       const sanitizedUrl = sanitizeGodfatUrl({
         startingUrl: augmentedUrl,
-        banners: bannerSelectOptions,
+        banners,
       });
       return {
         label: value.label,
@@ -114,7 +111,7 @@ export default function ConfigContainer({
         <UrlInput
           key={key}
           id={key}
-          bannerSelectOptions={bannerSelectOptions}
+          bannerSelectOptions={banners}
           removeSelf={() => removeInput(key)}
           setSelfValue={(value) => setInputValue(key, value)}
         />
