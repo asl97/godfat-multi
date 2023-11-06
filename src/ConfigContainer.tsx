@@ -58,7 +58,6 @@ export default function ConfigContainer({
   };
 
   const onSubmit = () => {
-    console.log(inputs);
     const bannerData = inputs.map(({ value }) => {
       const augmentedUrl = augmentGodfatUrlWithGlobalConfig({
         startingUrl: value.url,
