@@ -17,8 +17,6 @@ export default function TracksContainer({
 }: {
   configData: ConfigData;
 }) {
-  const [hoveredCell, setHoveredCell] = useState<CellData>({ row: "" });
-
   const urls = configData.bannerData.map((data) => data.url);
   const [parsedQueryData, setParsedQueryData] = useState<{
     trackAs: CatCell[][];
@@ -69,8 +67,6 @@ export default function TracksContainer({
     return <></>;
   }
 
-  console.log(parsedQueryData);
-
   return (
     <>
       <div
@@ -80,19 +76,16 @@ export default function TracksContainer({
           gap: "10px",
           padding: "10px",
         }}
-        onMouseOver={() => setHoveredCell({ row: "" })}
       >
         <TrackContainer
-          configData={configData}
           track="A"
-          hoveredCell={hoveredCell}
-          setHoveredCell={setHoveredCell}
+          configData={configData}
+          cells={parsedQueryData.trackAs}
         />
         <TrackContainer
-          configData={configData}
           track="B"
-          hoveredCell={hoveredCell}
-          setHoveredCell={setHoveredCell}
+          configData={configData}
+          cells={parsedQueryData.trackBs}
         />
       </div>
     </>
