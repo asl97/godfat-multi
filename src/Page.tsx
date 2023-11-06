@@ -28,6 +28,7 @@ export default function Page() {
     return <Typography variant="h5">Error fetching banner data!</Typography>;
   }
 
+  console.log(configData);
   return (
     <>
       <ConfigContainer banners={banners} setConfigData={setConfigData} />

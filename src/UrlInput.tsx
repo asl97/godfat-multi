@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 
-import { BannerSelectOption, isGodfatUrl } from "./utils/godfat";
+import {
+  BannerSelectOption,
+  isGodfatUrl,
+  urlInputToGodfatUrl,
+} from "./utils/godfat";
 
 import { FormControl, IconButton, InputLabel, Select } from "@mui/material";
 import TextField from "@mui/material/TextField/TextField";
@@ -42,6 +46,14 @@ export default function UrlInput({
     `${id}:customName`
   );
 
+  // Creating a new UrlInput will start selectedBanner as the default ("") when it should actually be the first banner.
+  // It's annoying to set the first banner as the default since it's dynamic - so we just set it here.
+  useEffect(() => {
+    if (selectedBanner === "") {
+      setSelectedBanner(bannerSelectOptions[0].options[0].value);
+    }
+  }, []);
+
   useEffect(() => {
     if (inputType === "input") {
       setSelfValue({
@@ -49,14 +61,12 @@ export default function UrlInput({
         url: inputUrl,
       });
     } else if (inputType === "select") {
-      const baseUrl = new URL("https://bc.godfat.org/");
-      if (numFutureUbers > 0) {
-        baseUrl.searchParams.set("ubers", numFutureUbers.toString());
-      }
-      baseUrl.searchParams.set("event", selectedBanner);
       setSelfValue({
         label: customName,
-        url: baseUrl.toString(),
+        url: urlInputToGodfatUrl({
+          selectedBanner,
+          numFutureUbers,
+        }),
       });
     }
   }, [inputType, selectedBanner, numFutureUbers, inputUrl, customName]);
@@ -71,7 +81,9 @@ export default function UrlInput({
         exclusive
         value={inputType}
         onChange={(_, value) => {
-          if (value === null) return;
+          if (value === null) {
+            return;
+          }
           setInputType(value);
         }}
       >

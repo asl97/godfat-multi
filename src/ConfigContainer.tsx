@@ -1,17 +1,11 @@
 import React, { useEffect } from "react";
 import {
   BannerSelectOption,
-  sortGodfatUrlQueryParams,
-  useGodfatQuery,
+  augmentGodfatUrlWithGlobalConfig,
+  sanitizeGodfatUrl,
 } from "./utils/godfat";
 import UrlInput from "./UrlInput";
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
 import styled from "@emotion/styled";
 import { BannerData, ConfigData } from "./Page";
 import {
@@ -21,28 +15,6 @@ import {
 } from "./utils/config";
 
 const generateKey = () => Math.random().toString(36).substring(7);
-
-const parseBannersFromHtml = (html: Document): BannerSelectOption[] => {
-  const eventSelect = html.getElementById("event_select");
-  if (!eventSelect) return [];
-
-  const results = [];
-  for (const optGroup of eventSelect.children) {
-    if ((optGroup as HTMLOptGroupElement).label === "Custom:") {
-      continue;
-    }
-
-    results.push({
-      groupLabel: (optGroup as HTMLOptGroupElement).label,
-      options: Array.from(optGroup.children).map((option) => ({
-        value: (option as HTMLOptionElement).value,
-        label: (option as HTMLOptionElement).text,
-      })),
-    });
-  }
-
-  return results;
-};
 
 const Row = styled.div`
   display: flex;
@@ -89,24 +61,20 @@ export default function ConfigContainer({
   };
 
   const onSubmit = () => {
-    // Godfat strips the event param from the URL if the event is the first non-plat banner, see
-    // https://gitlab.com/godfat/battle-cats-rolls/-/blob/master/lib/battle-cats-rolls/route.rb?ref_type=heads#L468
-    // Assume the first non-plat is in the "upcoming" (optgroup 1) as entry 3 (the first 2 are plat/legend)
-    const firstNonPlatBanner =
-      bannerSelectOptions?.[0].options?.find(
-        (o) =>
-          !o.label.toLowerCase().includes("platinum capsules") &&
-          !o.label.toLowerCase().includes("legend capsules")
-      )?.value || "";
+    console.log(inputs);
     const bannerData = inputs.map(({ value }) => {
-      const baseUrl = new URL(value.url);
-      // Selecting a banner will construct a URL without a seed, so just do it here
-      if (overrideSeeds || !baseUrl.searchParams.has("seed")) {
-        baseUrl.searchParams.set("seed", seed);
-      }
+      const augmentedUrl = augmentGodfatUrlWithGlobalConfig({
+        startingUrl: value.url,
+        overrideSeeds,
+        seed,
+      });
+      const sanitizedUrl = sanitizeGodfatUrl({
+        startingUrl: augmentedUrl,
+        banners: bannerSelectOptions,
+      });
       return {
         label: value.label,
-        url: sortGodfatUrlQueryParams(baseUrl.toString(), firstNonPlatBanner),
+        url: sanitizedUrl,
       };
     });
     setConfigData({ bannerData });
