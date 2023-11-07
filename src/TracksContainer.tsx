@@ -114,20 +114,41 @@ export default function TracksContainer({
     const trackIndex = configData.bannerData.findIndex(
       (data) => data.url === bannerUrl
     );
-    const trackList =
+
+    let currentTrackList =
       track === "A"
         ? parsedQueryData.trackAs[trackIndex]
         : parsedQueryData.trackBs[trackIndex];
-    console.log(trackList);
-
     // If not main cat, set lastCatName to a dupe to force the alt track
-    const lastCatName = isMainCat ? "" : trackList[num - 1].mainCat.name;
-    const currentNum = num;
-    const currentTrack = track;
+    let lastCatName = isMainCat ? "" : currentTrackList[num - 1].mainCat.name;
+    let currentNum = num;
+    let currentTrack = track;
     for (let i = 0; i < 10; i++) {
       console.log(lastCatName);
       console.log(currentNum);
       console.log(currentTrack);
+      // Find the cat
+      currentTrackList =
+        currentTrack === "A"
+          ? parsedQueryData.trackAs[trackIndex]
+          : parsedQueryData.trackBs[trackIndex];
+      const currentCatCell = currentTrackList[currentNum - 1];
+      if (!currentCatCell) {
+        break; // Probably went out of bounds
+      }
+
+      // Determine if it's a rare dupe
+      const isRareDupe =
+        currentCatCell.color === "white" &&
+        currentCatCell.mainCat.name === lastCatName;
+      if (!isRareDupe) {
+        lastCatName = currentCatCell.mainCat.name;
+        currentNum += 1;
+      } else {
+        lastCatName = currentCatCell.altCat!.name;
+        currentNum = currentCatCell.altCat!.destinationRow;
+        currentTrack = currentCatCell.altCat!.destinationTrack as "A" | "B";
+      }
     }
   }
 

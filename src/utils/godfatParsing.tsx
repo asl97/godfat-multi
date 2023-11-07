@@ -54,9 +54,12 @@ const extractMovementDataFromCatString = (
     splitCatString[0] === "<-"
       ? splitCatString[1]
       : splitCatString[splitCatString.length - 1];
-  const destinationTrack = destination.slice(destination.length - 1);
+  const destinationNoReroll = destination.replace("R", "");
+  const destinationTrack = destinationNoReroll.slice(
+    destinationNoReroll.length - 1
+  );
   const destinationRow = parseInt(
-    destination.slice(0, destination.length - 1),
+    destinationNoReroll.slice(0, destinationNoReroll.length - 1),
     10
   );
   return {
