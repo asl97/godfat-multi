@@ -16,20 +16,42 @@ const LabelTd = styled.td`
   background-color: #f5f5f5;
 `;
 
-const TopTd = styled.td<{ color?: string }>`
+const TopTd = styled.td<{ color?: string; backgroundType?: string }>`
   cursor: pointer;
   border: 1px solid black;
   border-bottom-style: none;
-  ${({ color }) => `background-color: ${color};`}
-  ${({ color }) => (color === "darkviolet" ? `color: #d8a56f; !important` : "")}
+  ${({ color }) => {
+    if (color === "darkviolet") {
+      return `background-color: ${color}; color: #d8a56f !important;`;
+    }
+    return `background-color: ${color};`;
+  }}
+  ${({ backgroundType }) => {
+    if (backgroundType === "selected") {
+      return `background-image: linear-gradient(#00000033, #00000033);`;
+    } else if (backgroundType === "next") {
+      return `background-image: repeating-linear-gradient(90deg, #00000055  5px, #00000055 15px, #00000033 15px, #00000033 25px)`;
+    }
+  }}
 `;
 
-const BottomTd = styled.td<{ color?: string }>`
+const BottomTd = styled.td<{ color?: string; backgroundType?: string }>`
   cursor: pointer;
   border: 1px solid black;
   border-top-style: none;
-  ${({ color }) => `background-color: ${color};`}
-  ${({ color }) => (color === "darkviolet" ? `color: #d8a56f !important;` : "")}
+  ${({ color }) => {
+    if (color === "darkviolet") {
+      return `background-color: ${color}; color: #d8a56f !important;`;
+    }
+    return `background-color: ${color};`;
+  }}
+  ${({ backgroundType }) => {
+    if (backgroundType === "selected") {
+      return `background-image: linear-gradient(#00000033, #00000033);`;
+    } else if (backgroundType === "next") {
+      return `background-image: repeating-linear-gradient(90deg, #00000055  5px, #00000055 15px, #00000033 15px, #00000033 25px)`;
+    }
+  }}
 `;
 
 const StickyRow = styled.tr`
@@ -140,6 +162,7 @@ export default function TrackContainer({
                             );
                           }}
                           color={catCell.color}
+                          backgroundType={catCell.mainCat?.backgroundType}
                         >
                           {isTrackSwitchCell ? (
                             <CatAnchor
@@ -167,6 +190,9 @@ export default function TrackContainer({
                               );
                             }}
                             color={catCell.guaranteeColor}
+                            backgroundType={
+                              catCell.guaranteeMainCat?.backgroundType
+                            }
                           >
                             {isTrackSwitchCell ? (
                               <CatAnchor
@@ -205,6 +231,11 @@ export default function TrackContainer({
                             );
                           }}
                           color={catCell.color}
+                          backgroundType={
+                            isTrackSwitchCell
+                              ? catCell.altCat?.backgroundType
+                              : catCell.mainCat?.backgroundType
+                          }
                         >
                           {isTrackSwitchCell ? (
                             <CatAnchor
@@ -232,6 +263,11 @@ export default function TrackContainer({
                               );
                             }}
                             color={catCell.guaranteeColor}
+                            backgroundType={
+                              isTrackSwitchCell
+                                ? catCell.guaranteeAltCat?.backgroundType
+                                : catCell.guaranteeMainCat?.backgroundType
+                            }
                           >
                             {isTrackSwitchCell ? (
                               <CatAnchor

@@ -88,6 +88,7 @@ export default function TracksContainer({
         res.trackBs.push(trackBCats);
       }
       setParsedQueryData(res);
+      setSelectedCell("");
     })();
 
     return () => {};
@@ -105,7 +106,7 @@ export default function TracksContainer({
     return <></>;
   }
 
-  console.log(parsedQueryData);
+  const queryData = JSON.parse(JSON.stringify(parsedQueryData));
 
   if (selectedCell) {
     const { bannerUrl, num, track, isMainCat, isGuaranteed } =
@@ -117,26 +118,44 @@ export default function TracksContainer({
 
     let currentTrackList =
       track === "A"
-        ? parsedQueryData.trackAs[trackIndex]
-        : parsedQueryData.trackBs[trackIndex];
+        ? queryData.trackAs[trackIndex]
+        : queryData.trackBs[trackIndex];
+
+    let guaranteedDestinationRow = null;
+    let guaranteedDestinationTrack = null;
+    if (isGuaranteed) {
+      const currentCatCell = currentTrackList[num - 1];
+      if (isMainCat) {
+        currentCatCell.guaranteeMainCat!.backgroundType = "selected";
+        guaranteedDestinationRow =
+          currentCatCell.guaranteeMainCat?.destinationRow;
+        guaranteedDestinationTrack =
+          currentCatCell.guaranteeMainCat?.destinationTrack;
+      } else {
+        currentCatCell.guaranteeAltCat!.backgroundType = "selected";
+        guaranteedDestinationRow =
+          currentCatCell.guaranteeAltCat?.destinationRow;
+        guaranteedDestinationTrack =
+          currentCatCell.guaranteeAltCat?.destinationTrack;
+      }
+    }
     // If not main cat, set lastCatName to a dupe to force the alt track
     let lastCatName = isMainCat ? "" : currentTrackList[num - 1].mainCat.name;
     let currentNum = num;
     let currentTrack = track;
-    for (let i = 0; i < 10; i++) {
-      console.log(lastCatName);
-      console.log(currentNum);
-      console.log(currentTrack);
+    let numRolls = 0;
+    while (true) {
       // Find the cat
       currentTrackList =
         currentTrack === "A"
-          ? parsedQueryData.trackAs[trackIndex]
-          : parsedQueryData.trackBs[trackIndex];
+          ? queryData.trackAs[trackIndex]
+          : queryData.trackBs[trackIndex];
       const currentCatCell = currentTrackList[currentNum - 1];
       if (!currentCatCell) {
         break; // Probably went out of bounds
       }
 
+      let currentCat;
       // Determine if it's a rare dupe
       const isRareDupe =
         currentCatCell.color === "white" &&
@@ -144,10 +163,39 @@ export default function TracksContainer({
       if (!isRareDupe) {
         lastCatName = currentCatCell.mainCat.name;
         currentNum += 1;
+        currentCat = currentCatCell.mainCat;
       } else {
         lastCatName = currentCatCell.altCat!.name;
         currentNum = currentCatCell.altCat!.destinationRow;
         currentTrack = currentCatCell.altCat!.destinationTrack as "A" | "B";
+        currentCat = currentCatCell.altCat!;
+      }
+      currentCat.backgroundType = "selected";
+      numRolls += 1;
+
+      if (isGuaranteed) {
+        // STOP WHEN: IF (ends on A) THEN (when we get to i-1B) IF (ends on B) THEN (when we get to iA)
+        if (
+          (guaranteedDestinationTrack === "A" &&
+            currentNum + 1 === guaranteedDestinationRow &&
+            currentTrack === "B") ||
+          (guaranteedDestinationTrack === "B" &&
+            currentNum === guaranteedDestinationRow &&
+            currentTrack === "A")
+        ) {
+          const guaranteedCatCell = (
+            guaranteedDestinationTrack === "A"
+              ? queryData.trackAs
+              : queryData.trackBs
+          )[trackIndex][guaranteedDestinationRow - 1];
+          guaranteedCatCell.mainCat.backgroundType = "next";
+          break;
+        }
+      } else {
+        if (numRolls === 2) {
+          currentCat.backgroundType = "next";
+          break;
+        }
       }
     }
   }
@@ -165,14 +213,14 @@ export default function TracksContainer({
         <TrackContainer
           track="A"
           configData={configData}
-          cells={parsedQueryData.trackAs}
+          cells={queryData.trackAs}
           setSeed={setSeed}
           setSelectedCell={setSelectedCell}
         />
         <TrackContainer
           track="B"
           configData={configData}
-          cells={parsedQueryData.trackBs}
+          cells={queryData.trackBs}
           setSeed={setSeed}
           setSelectedCell={setSelectedCell}
         />

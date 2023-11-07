@@ -4,6 +4,7 @@ type CatData = {
   destinationRow: number;
   destinationTrack: string;
   href: string;
+  backgroundType?: "selected" | "next";
 };
 
 export type CatCell = {
