@@ -1,29 +1,19 @@
+type CatData = {
+  text: string;
+  name: string;
+  destinationRow: number;
+  destinationTrack: string;
+  href: string;
+};
+
 export type CatCell = {
   color: string;
-  mainCat: {
-    text: string;
-    href: string;
-  };
-  altCat?: {
-    text: string;
-    destinationRow: number;
-    destinationTrack: string;
-    href: string;
-  };
+  mainCat: CatData;
+  altCat?: CatData;
 
   guaranteeColor: string;
-  guaranteeMainCat?: {
-    text: string;
-    destinationRow: number;
-    destinationTrack: string;
-    href: string;
-  };
-  guaranteeAltCat?: {
-    text: string;
-    destinationRow: number;
-    destinationTrack: string;
-    href: string;
-  };
+  guaranteeMainCat?: CatData;
+  guaranteeAltCat?: CatData;
 };
 
 const getColorFromClass = (className: string): string => {
@@ -53,7 +43,12 @@ const extractCatStringFromTd = (td: HTMLElement): string => {
 
 const extractMovementDataFromCatString = (
   catString: string
-): { text: string; destinationRow: number; destinationTrack: string } => {
+): {
+  text: string;
+  name: string;
+  destinationRow: number;
+  destinationTrack: string;
+} => {
   const splitCatString = catString.split(" ");
   const destination =
     splitCatString[0] === "<-"
@@ -66,6 +61,11 @@ const extractMovementDataFromCatString = (
   );
   return {
     text: catString,
+    name: catString
+      .replace("<-", "")
+      .replace("->", "")
+      .replace(destination, "")
+      .trim(),
     destinationRow,
     destinationTrack,
   };
@@ -122,7 +122,10 @@ export const extractCatsFromTable = (
           guaranteeColor: getColorFromClass(
             guaranteeCol.getAttribute("class")!
           ),
-          mainCat: { text: data, href: normalColHref },
+          mainCat: {
+            ...extractMovementDataFromCatString(data),
+            href: normalColHref,
+          },
           guaranteeMainCat: {
             ...extractMovementDataFromCatString(guaranteeData),
             href: guaranteeColHref,
