@@ -4,7 +4,7 @@ import { jsx } from "@emotion/react";
 import styled from "@emotion/styled";
 import { ConfigData } from "./Page";
 import { CatCell } from "./utils/godfatParsing";
-import { serSelectedCell } from "./TracksContainer";
+import { serSelectedCell } from "./utils/cellSelection";
 
 const zip = (arr: any[]) =>
   Array(Math.min(...arr.map((a) => a.length)))

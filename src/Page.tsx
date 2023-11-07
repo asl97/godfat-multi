@@ -52,6 +52,11 @@ export default function Page() {
     setSeed(seed);
     setForceReload((forceReload) => forceReload + 1);
   };
+  // The planning function is used across config and tracks
+  const [plannedCells, setPlannedCells] = useState<string[]>([]);
+  const addPlannedCell = (cell: string) => {
+    setPlannedCells((plannedCells) => [...plannedCells, cell]);
+  };
 
   const [configData, setConfigData] = React.useState<ConfigData>({
     bannerData: [],
@@ -76,6 +81,8 @@ export default function Page() {
         forceReload={forceReload}
       />
       <TracksContainer
+        plannedCells={plannedCells}
+        addPlannedCell={addPlannedCell}
         banners={banners}
         configData={configData}
         setSeed={setSeedAndForceReload}

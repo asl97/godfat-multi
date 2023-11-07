@@ -7,6 +7,7 @@ import { corsUrl } from "./utils/query";
 import { Typography } from "@mui/material";
 import { CatCell, extractCatsFromTable } from "./utils/godfatParsing";
 import { BannerSelectOption, urlToRareCatQueryUrl } from "./utils/godfat";
+import { desSelectedCell } from "./utils/cellSelection";
 
 export type CellData = {
   row: string;
@@ -16,39 +17,6 @@ export type CellData = {
 type QueryData = {
   trackAs: CatCell[][];
   trackBs: CatCell[][];
-};
-
-export const serSelectedCell = ({
-  bannerUrl,
-  num,
-  track,
-  isMainCat,
-  isGuaranteed,
-}: {
-  bannerUrl: string;
-  num: number;
-  track: "A" | "B";
-  isMainCat: boolean;
-  isGuaranteed: boolean;
-}) => `${bannerUrl};${num};${track};${isMainCat};${isGuaranteed}`;
-
-export const desSelectedCell = (
-  str: string
-): {
-  bannerUrl: string;
-  num: number;
-  track: "A" | "B";
-  isMainCat: boolean;
-  isGuaranteed: boolean;
-} => {
-  const split = str.split(";");
-  return {
-    bannerUrl: split[0],
-    num: parseInt(split[1], 10),
-    track: split[2] as "A" | "B",
-    isMainCat: split[3] === "true",
-    isGuaranteed: split[4] === "true",
-  };
 };
 
 const handleCellSelection = ({
@@ -177,12 +145,15 @@ export default function TracksContainer({
   banners,
   configData,
   setSeed,
+  plannedCells,
+  addPlannedCell,
 }: {
   banners: BannerSelectOption[];
   configData: ConfigData;
   setSeed: (seed: string) => void;
+  plannedCells: string[];
+  addPlannedCell: (cell: string) => void;
 }) {
-  // num(int);track(A|B);mainCat(bool);guaranteed(bool)
   const [selectedCell, setSelectedCell] = useState("");
 
   const urls = configData.bannerData.map((data) => data.url);
