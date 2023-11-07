@@ -182,12 +182,19 @@ export const urlToRareCatQueryUrl = ({
   banners: BannerSelectOption[];
 }) => {
   // A rare cat query URL is a query with seed=1, details=true, and the event from the original URL.
-  const event = new URL(url).searchParams.get("event");
+  const searchParams = new URL(url).searchParams;
+  const event = searchParams.get("event");
   const rareCatQueryUrl = new URL(BASE_GODFAT_URL);
   rareCatQueryUrl.searchParams.set("seed", "1");
   rareCatQueryUrl.searchParams.set("details", "true");
   if (event) {
     rareCatQueryUrl.searchParams.set("event", event);
+    if (event === "custom") {
+      const custom = searchParams.get("custom");
+      const rate = searchParams.get("rate");
+      rareCatQueryUrl.searchParams.set("custom", custom || "");
+      rareCatQueryUrl.searchParams.set("rate", rate || "");
+    }
   }
   return sanitizeGodfatUrl({
     startingUrl: rareCatQueryUrl.toString(),
