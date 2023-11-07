@@ -173,3 +173,24 @@ export const sanitizeGodfatUrl = ({
   const sortedUpdatedParams = `/?${updatedParams.join("&")}`;
   return `${url.origin}${sortedUpdatedParams}`;
 };
+
+export const urlToRareCatQueryUrl = ({
+  url,
+  banners,
+}: {
+  url: string;
+  banners: BannerSelectOption[];
+}) => {
+  // A rare cat query URL is a query with seed=1, details=true, and the event from the original URL.
+  const event = new URL(url).searchParams.get("event");
+  const rareCatQueryUrl = new URL(BASE_GODFAT_URL);
+  rareCatQueryUrl.searchParams.set("seed", "1");
+  rareCatQueryUrl.searchParams.set("details", "true");
+  if (event) {
+    rareCatQueryUrl.searchParams.set("event", event);
+  }
+  return sanitizeGodfatUrl({
+    startingUrl: rareCatQueryUrl.toString(),
+    banners,
+  });
+};

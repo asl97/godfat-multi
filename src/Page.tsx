@@ -76,6 +76,7 @@ export default function Page() {
         forceReload={forceReload}
       />
       <TracksContainer
+        banners={banners}
         configData={configData}
         setSeed={setSeedAndForceReload}
       />

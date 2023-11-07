@@ -6,6 +6,7 @@ import { useQueries } from "react-query";
 import { corsUrl } from "./utils/query";
 import { Typography } from "@mui/material";
 import { CatCell, extractCatsFromTable } from "./utils/godfatParsing";
+import { BannerSelectOption, urlToRareCatQueryUrl } from "./utils/godfat";
 
 export type CellData = {
   row: string;
@@ -46,9 +47,11 @@ export const desSelectedCell = (
 };
 
 export default function TracksContainer({
+  banners,
   configData,
   setSeed,
 }: {
+  banners: BannerSelectOption[];
   configData: ConfigData;
   setSeed: (seed: string) => void;
 }) {
@@ -60,6 +63,7 @@ export default function TracksContainer({
     trackAs: CatCell[][];
     trackBs: CatCell[][];
   }>({ trackAs: [], trackBs: [] });
+  const [rareCats, setRareCats] = useState(new Set<string>());
 
   const queries = useQueries(
     urls.map((url) => ({
@@ -68,8 +72,23 @@ export default function TracksContainer({
       staleTime: Infinity,
     }))
   );
+  const rareCatQueries = useQueries(
+    urls.map((url) => {
+      const rareCatQueryUrl = urlToRareCatQueryUrl({
+        url,
+        banners,
+      });
+      return {
+        queryKey: [rareCatQueryUrl],
+        queryFn: () => fetch(corsUrl(rareCatQueryUrl)),
+        staleTime: Infinity,
+      };
+    })
+  );
 
-  const allQueriesResolved = queries.every((query) => query.isFetched);
+  const allQueriesResolved =
+    queries.every((query) => query.isFetched) &&
+    rareCatQueries.every((query) => query.isFetched);
 
   useEffect(() => {
     (async () => {
@@ -79,7 +98,7 @@ export default function TracksContainer({
       };
       const successfulQueries = queries.filter((query) => query.isSuccess);
       for (const query of successfulQueries) {
-        const dataText = await query.data!.clone().text(); // Inefficient (parallelizable). Who cares?
+        const dataText = await query.data!.clone().text();
         const dataDom = new DOMParser().parseFromString(dataText, "text/html");
         const dataTable = dataDom.getElementsByTagName("table")[0]; // Godfat page is guaranteed to have one table
         const trackACats = extractCatsFromTable(dataTable, "A");
@@ -88,11 +107,29 @@ export default function TracksContainer({
         res.trackBs.push(trackBCats);
       }
       setParsedQueryData(res);
+
+      const successfulRareCatQueries = rareCatQueries.filter(
+        (query) => query.isSuccess
+      );
+      const rareCatSet = new Set<string>();
+      for (const query of successfulRareCatQueries) {
+        const dataText = await query.data!.clone().text();
+        const dataDom = new DOMParser().parseFromString(dataText, "text/html");
+        const dataDiv = dataDom.getElementsByClassName("information")[0]; // Details page is guaranteed to have one .information
+        const catAnchors = dataDiv
+          .getElementsByTagName("li")[0]
+          .getElementsByTagName("a");
+        for (const anchor of catAnchors) {
+          rareCatSet.add(anchor.textContent!);
+        }
+      }
+      setRareCats(rareCatSet);
+
       setSelectedCell("");
     })();
 
     return () => {};
-  }, [allQueriesResolved, queries.length]); // TODO fix this?
+  }, [allQueriesResolved, queries.length, rareCatQueries.length]); // TODO fix this?
 
   if (!allQueriesResolved) {
     return <Typography variant="h5">Loading banner data...</Typography>;
@@ -165,7 +202,7 @@ export default function TracksContainer({
       let currentCat;
       // Determine if it's a rare dupe
       const isRareDupe =
-        currentCatCell.color === "white" &&
+        rareCats.has(currentCatCell.mainCat.name) &&
         currentCatCell.mainCat.name === lastCatName;
       if (!isRareDupe) {
         lastCatName = currentCatCell.mainCat.name;
@@ -213,7 +250,8 @@ export default function TracksContainer({
       const catCell = track[nextCatNum! - 1];
       if (catCell) {
         const isRareDupe =
-          catCell.color === "white" && catCell.mainCat.name === lastCatName;
+          rareCats.has(catCell.mainCat.name) &&
+          catCell.mainCat.name === lastCatName;
         if (!isRareDupe) {
           // Highlight the main and guaranteed main cats
           catCell.mainCat.backgroundType = "next";
