@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+/** @jsx jsx */
+import React, { useState } from "react";
+import { jsx, css } from "@emotion/react";
 
 import ConfigContainer from "./ConfigContainer";
 import TracksContainer from "./TracksContainer";
@@ -14,6 +16,32 @@ export type BannerData = {
 export type ConfigData = {
   bannerData: BannerData[];
 };
+
+const globalCss = css`
+  margin: 0;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+
+  table {
+    border-collapse: collapse;
+  }
+  table,
+  td {
+    white-space: nowrap;
+    text-align: center;
+  }
+  th {
+    border: 1px solid black;
+    font-weight: bold;
+  }
+
+  td:empty::after {
+    content: "\\00a0";
+  }
+`;
 
 export default function Page() {
   // This is modified in TracksContainer when clicking to update seed, so it's pulled out to this level
@@ -39,7 +67,7 @@ export default function Page() {
   }
 
   return (
-    <>
+    <div css={globalCss}>
       <ConfigContainer
         banners={banners}
         setConfigData={setConfigData}
@@ -51,6 +79,6 @@ export default function Page() {
         configData={configData}
         setSeed={setSeedAndForceReload}
       />
-    </>
+    </div>
   );
 }

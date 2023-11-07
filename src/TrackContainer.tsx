@@ -1,11 +1,9 @@
 /** @jsx jsx */
 import { Fragment } from "react";
 import { jsx } from "@emotion/react";
-import { godfatCss } from "./utils/godfat";
 import styled from "@emotion/styled";
 import { ConfigData } from "./Page";
 import { CatCell } from "./utils/godfatParsing";
-import { useStorageLinkedString } from "./utils/config";
 
 const zip = (arr: any[]) =>
   Array(Math.min(...arr.map((a) => a.length)))
@@ -85,7 +83,7 @@ export default function TrackContainer({
   );
 
   return (
-    <div css={godfatCss}>
+    <div>
       <table css={{ backgroundColor: "black" }}>
         <tbody>
           <StickyRow>
