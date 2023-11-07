@@ -3,7 +3,8 @@ import { BannerData } from "../Page";
 
 const DEFAULTS = {
   seed: "",
-  overrideSeeds: true,
+  lastCatId: 0,
+  count: 100,
   inputKeys: [],
 };
 

@@ -84,17 +84,16 @@ export const urlInputToGodfatUrl = ({
 
 export const augmentGodfatUrlWithGlobalConfig = ({
   startingUrl,
-  overrideSeeds,
   seed,
+  count,
 }: {
   startingUrl: string;
-  overrideSeeds: boolean;
   seed: string;
+  count: number;
 }) => {
   const url = new URL(startingUrl);
-  if (overrideSeeds || !url.searchParams.has("seed")) {
-    url.searchParams.set("seed", seed);
-  }
+  url.searchParams.set("seed", seed);
+  url.searchParams.set("count", count.toString());
   return url.toString();
 };
 

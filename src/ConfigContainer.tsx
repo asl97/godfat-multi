@@ -5,12 +5,21 @@ import {
   sanitizeGodfatUrl,
 } from "./utils/godfat";
 import UrlInput from "./UrlInput";
-import { Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  Select,
+  TextField,
+} from "@mui/material";
 import styled from "@emotion/styled";
 import { BannerData, ConfigData } from "./Page";
 import {
   useStorageLinkedBoolean,
   useStorageLinkedInputs,
+  useStorageLinkedNumber,
   useStorageLinkedString,
 } from "./utils/config";
 
@@ -36,8 +45,7 @@ export default function ConfigContainer({
   setSeed: (seed: string) => void;
   forceReload: number;
 }) {
-  const [overrideSeeds, setOverrideSeeds] =
-    useStorageLinkedBoolean("overrideSeeds");
+  const [count, setCount] = useStorageLinkedNumber("count");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
 
   const addNewInput = () => {
@@ -66,8 +74,8 @@ export default function ConfigContainer({
     const bannerData = inputs.map(({ value }) => {
       const augmentedUrl = augmentGodfatUrlWithGlobalConfig({
         startingUrl: value.url,
-        overrideSeeds,
         seed,
+        count,
       });
       const sanitizedUrl = sanitizeGodfatUrl({
         startingUrl: augmentedUrl,
@@ -102,15 +110,35 @@ export default function ConfigContainer({
           }}
           error={isNaN(Number(seed)) || Number(seed) === 0}
         />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={overrideSeeds}
-              onChange={(event) => setOverrideSeeds(event.target.checked)}
-            />
-          }
-          label="Use to override seeds in direct links"
-        />
+        <FormControl>
+          <InputLabel id="count-select" shrink>
+            Count
+          </InputLabel>
+          <Select
+            notched
+            native
+            size="small"
+            labelId="count-select"
+            label="Count"
+            value={count}
+            onChange={(event) => {
+              setCount(event.target.value as number);
+            }}
+          >
+            <option key={"100"} value={100}>
+              100
+            </option>
+            <option key={"200"} value={200}>
+              200
+            </option>
+            <option key={"500"} value={500}>
+              500
+            </option>
+            <option key={"999"} value={999}>
+              999
+            </option>
+          </Select>
+        </FormControl>
       </Row>
       <Row>
         <Button variant="outlined" onClick={addNewInput}>
