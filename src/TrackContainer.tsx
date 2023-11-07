@@ -131,6 +131,7 @@ export default function TrackContainer({
                           onClick={() => {
                             setSelectedCell(
                               serSelectedCell({
+                                bannerUrl: configData.bannerData[j].url,
                                 num: i + 1,
                                 track,
                                 isMainCat: true,
@@ -157,6 +158,7 @@ export default function TrackContainer({
                             onClick={() => {
                               setSelectedCell(
                                 serSelectedCell({
+                                  bannerUrl: configData.bannerData[j].url,
                                   num: i + 1,
                                   track,
                                   isMainCat: true,
@@ -194,6 +196,7 @@ export default function TrackContainer({
                           onClick={() => {
                             setSelectedCell(
                               serSelectedCell({
+                                bannerUrl: configData.bannerData[j].url,
                                 num: i + 1,
                                 track,
                                 isMainCat: !isTrackSwitchCell,
@@ -220,6 +223,7 @@ export default function TrackContainer({
                             onClick={() => {
                               setSelectedCell(
                                 serSelectedCell({
+                                  bannerUrl: configData.bannerData[j].url,
                                   num: i + 1,
                                   track,
                                   isMainCat: !isTrackSwitchCell,

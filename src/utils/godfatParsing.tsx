@@ -64,7 +64,7 @@ const extractMovementDataFromCatString = (
     name: catString
       .replace("<-", "")
       .replace("->", "")
-      .replace(destination, "")
+      .replace(isNaN(destinationRow) ? "" : destination, "")
       .trim(),
     destinationRow,
     destinationTrack,

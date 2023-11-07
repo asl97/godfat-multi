@@ -13,20 +13,23 @@ export type CellData = {
 };
 
 export const serSelectedCell = ({
+  bannerUrl,
   num,
   track,
   isMainCat,
   isGuaranteed,
 }: {
+  bannerUrl: string;
   num: number;
   track: "A" | "B";
   isMainCat: boolean;
   isGuaranteed: boolean;
-}) => `${num};${track};${isMainCat};${isGuaranteed}`;
+}) => `${bannerUrl};${num};${track};${isMainCat};${isGuaranteed}`;
 
 export const desSelectedCell = (
   str: string
 ): {
+  bannerUrl: string;
   num: number;
   track: "A" | "B";
   isMainCat: boolean;
@@ -34,10 +37,11 @@ export const desSelectedCell = (
 } => {
   const split = str.split(";");
   return {
-    num: parseInt(split[0], 10),
-    track: split[1] as "A" | "B",
-    isMainCat: split[2] === "true",
-    isGuaranteed: split[3] === "true",
+    bannerUrl: split[0],
+    num: parseInt(split[1], 10),
+    track: split[2] as "A" | "B",
+    isMainCat: split[3] === "true",
+    isGuaranteed: split[4] === "true",
   };
 };
 
@@ -104,7 +108,27 @@ export default function TracksContainer({
   console.log(parsedQueryData);
 
   if (selectedCell) {
-    console.log(desSelectedCell(selectedCell));
+    const { bannerUrl, num, track, isMainCat, isGuaranteed } =
+      desSelectedCell(selectedCell);
+
+    const trackIndex = configData.bannerData.findIndex(
+      (data) => data.url === bannerUrl
+    );
+    const trackList =
+      track === "A"
+        ? parsedQueryData.trackAs[trackIndex]
+        : parsedQueryData.trackBs[trackIndex];
+    console.log(trackList);
+
+    // If not main cat, set lastCatName to a dupe to force the alt track
+    const lastCatName = isMainCat ? "" : trackList[num - 1].mainCat.name;
+    const currentNum = num;
+    const currentTrack = track;
+    for (let i = 0; i < 10; i++) {
+      console.log(lastCatName);
+      console.log(currentNum);
+      console.log(currentTrack);
+    }
   }
 
   return (
