@@ -12,6 +12,35 @@ export type CellData = {
   target?: string;
 };
 
+export const serSelectedCell = ({
+  num,
+  track,
+  isMainCat,
+  isGuaranteed,
+}: {
+  num: number;
+  track: "A" | "B";
+  isMainCat: boolean;
+  isGuaranteed: boolean;
+}) => `${num};${track};${isMainCat};${isGuaranteed}`;
+
+export const desSelectedCell = (
+  str: string
+): {
+  num: number;
+  track: "A" | "B";
+  isMainCat: boolean;
+  isGuaranteed: boolean;
+} => {
+  const split = str.split(";");
+  return {
+    num: parseInt(split[0], 10),
+    track: split[1] as "A" | "B",
+    isMainCat: split[2] === "true",
+    isGuaranteed: split[3] === "true",
+  };
+};
+
 export default function TracksContainer({
   configData,
   setSeed,
@@ -19,6 +48,9 @@ export default function TracksContainer({
   configData: ConfigData;
   setSeed: (seed: string) => void;
 }) {
+  // num(int);track(A|B);mainCat(bool);guaranteed(bool)
+  const [selectedCell, setSelectedCell] = useState("");
+
   const urls = configData.bannerData.map((data) => data.url);
   const [parsedQueryData, setParsedQueryData] = useState<{
     trackAs: CatCell[][];
@@ -71,6 +103,10 @@ export default function TracksContainer({
 
   console.log(parsedQueryData);
 
+  if (selectedCell) {
+    console.log(desSelectedCell(selectedCell));
+  }
+
   return (
     <>
       <div
@@ -86,12 +122,14 @@ export default function TracksContainer({
           configData={configData}
           cells={parsedQueryData.trackAs}
           setSeed={setSeed}
+          setSelectedCell={setSelectedCell}
         />
         <TrackContainer
           track="B"
           configData={configData}
           cells={parsedQueryData.trackBs}
           setSeed={setSeed}
+          setSelectedCell={setSelectedCell}
         />
       </div>
     </>

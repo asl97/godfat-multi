@@ -4,6 +4,7 @@ import { jsx } from "@emotion/react";
 import styled from "@emotion/styled";
 import { ConfigData } from "./Page";
 import { CatCell } from "./utils/godfatParsing";
+import { serSelectedCell } from "./TracksContainer";
 
 const zip = (arr: any[]) =>
   Array(Math.min(...arr.map((a) => a.length)))
@@ -16,6 +17,7 @@ const LabelTd = styled.td`
 `;
 
 const TopTd = styled.td<{ color?: string }>`
+  cursor: pointer;
   border: 1px solid black;
   border-bottom-style: none;
   ${({ color }) => `background-color: ${color};`}
@@ -23,6 +25,7 @@ const TopTd = styled.td<{ color?: string }>`
 `;
 
 const BottomTd = styled.td<{ color?: string }>`
+  cursor: pointer;
   border: 1px solid black;
   border-top-style: none;
   ${({ color }) => `background-color: ${color};`}
@@ -58,7 +61,7 @@ const CatAnchor = ({
         if (destinationSeed) {
           setSeed(destinationSeed);
         }
-        e.preventDefault();
+        e.stopPropagation();
       }}
     >
       {cat.text}
@@ -71,11 +74,13 @@ export default function TrackContainer({
   configData,
   cells,
   setSeed,
+  setSelectedCell,
 }: {
   track: "A" | "B";
   configData: ConfigData;
   cells: CatCell[][];
   setSeed: (seed: string) => void;
+  setSelectedCell: (selectedCell: string) => void;
 }) {
   const zippedCells: CatCell[][] = zip(cells);
   const isGuaranteedArray = zippedCells[0].map((catCell) =>
@@ -122,7 +127,19 @@ export default function TrackContainer({
                     const isGuaranteeCell = isGuaranteedArray[j];
                     return (
                       <Fragment key={j}>
-                        <TopTd color={catCell.color}>
+                        <TopTd
+                          onClick={() => {
+                            setSelectedCell(
+                              serSelectedCell({
+                                num: i + 1,
+                                track,
+                                isMainCat: true,
+                                isGuaranteed: false,
+                              })
+                            );
+                          }}
+                          color={catCell.color}
+                        >
                           {isTrackSwitchCell ? (
                             <CatAnchor
                               cat={catCell.mainCat}
@@ -136,7 +153,19 @@ export default function TrackContainer({
                           )}
                         </TopTd>
                         {isGuaranteeCell && (
-                          <TopTd color={catCell.guaranteeColor}>
+                          <TopTd
+                            onClick={() => {
+                              setSelectedCell(
+                                serSelectedCell({
+                                  num: i + 1,
+                                  track,
+                                  isMainCat: true,
+                                  isGuaranteed: true,
+                                })
+                              );
+                            }}
+                            color={catCell.guaranteeColor}
+                          >
                             {isTrackSwitchCell ? (
                               <CatAnchor
                                 cat={catCell.guaranteeMainCat}
@@ -161,7 +190,19 @@ export default function TrackContainer({
                     const isGuaranteeCell = isGuaranteedArray[j];
                     return (
                       <Fragment key={j}>
-                        <BottomTd color={catCell.color}>
+                        <BottomTd
+                          onClick={() => {
+                            setSelectedCell(
+                              serSelectedCell({
+                                num: i + 1,
+                                track,
+                                isMainCat: !isTrackSwitchCell,
+                                isGuaranteed: false,
+                              })
+                            );
+                          }}
+                          color={catCell.color}
+                        >
                           {isTrackSwitchCell ? (
                             <CatAnchor
                               cat={catCell.altCat}
@@ -175,7 +216,19 @@ export default function TrackContainer({
                           )}
                         </BottomTd>
                         {isGuaranteeCell && (
-                          <BottomTd color={catCell.guaranteeColor}>
+                          <BottomTd
+                            onClick={() => {
+                              setSelectedCell(
+                                serSelectedCell({
+                                  num: i + 1,
+                                  track,
+                                  isMainCat: !isTrackSwitchCell,
+                                  isGuaranteed: true,
+                                })
+                              );
+                            }}
+                            color={catCell.guaranteeColor}
+                          >
                             {isTrackSwitchCell ? (
                               <CatAnchor
                                 cat={catCell.guaranteeAltCat}
