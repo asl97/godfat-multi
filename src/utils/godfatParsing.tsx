@@ -2,11 +2,13 @@ export type CatCell = {
   color: string;
   mainCat: {
     text: string;
+    href: string;
   };
   altCat?: {
     text: string;
     destinationRow: number;
     destinationTrack: string;
+    href: string;
   };
 
   guaranteeColor: string;
@@ -14,11 +16,13 @@ export type CatCell = {
     text: string;
     destinationRow: number;
     destinationTrack: string;
+    href: string;
   };
   guaranteeAltCat?: {
     text: string;
     destinationRow: number;
     destinationTrack: string;
+    href: string;
   };
 };
 
@@ -99,20 +103,30 @@ export const extractCatsFromTable = (
       // Still have more data to read
       const normalCol = row.children[trackA ? 0 : lastIndex - 1];
       const guaranteeCol = row.children[trackA ? 1 : lastIndex];
+      const normalColHref = normalCol.getElementsByTagName("a")[0]?.href;
+      const guaranteeColHref = guaranteeCol.getElementsByTagName("a")[0]?.href;
       const data = extractCatStringFromTd(normalCol as HTMLElement);
       const guaranteeData = extractCatStringFromTd(guaranteeCol as HTMLElement);
       if (currentCatCell?.mainCat) {
-        currentCatCell.altCat = extractMovementDataFromCatString(data);
-        currentCatCell.guaranteeAltCat =
-          extractMovementDataFromCatString(guaranteeData);
+        currentCatCell.altCat = {
+          ...extractMovementDataFromCatString(data),
+          href: normalColHref,
+        };
+        currentCatCell.guaranteeAltCat = {
+          ...extractMovementDataFromCatString(guaranteeData),
+          href: guaranteeColHref,
+        };
       } else {
         currentCatCell = {
           color: getColorFromClass(normalCol.getAttribute("class")!),
           guaranteeColor: getColorFromClass(
             guaranteeCol.getAttribute("class")!
           ),
-          mainCat: { text: data },
-          guaranteeMainCat: extractMovementDataFromCatString(guaranteeData),
+          mainCat: { text: data, href: normalColHref },
+          guaranteeMainCat: {
+            ...extractMovementDataFromCatString(guaranteeData),
+            href: guaranteeColHref,
+          },
         };
       }
       numDataRows--;

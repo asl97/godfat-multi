@@ -14,8 +14,10 @@ export type CellData = {
 
 export default function TracksContainer({
   configData,
+  setSeed,
 }: {
   configData: ConfigData;
+  setSeed: (seed: string) => void;
 }) {
   const urls = configData.bannerData.map((data) => data.url);
   const [parsedQueryData, setParsedQueryData] = useState<{
@@ -67,6 +69,8 @@ export default function TracksContainer({
     return <></>;
   }
 
+  console.log(parsedQueryData);
+
   return (
     <>
       <div
@@ -81,11 +85,13 @@ export default function TracksContainer({
           track="A"
           configData={configData}
           cells={parsedQueryData.trackAs}
+          setSeed={setSeed}
         />
         <TrackContainer
           track="B"
           configData={configData}
           cells={parsedQueryData.trackBs}
+          setSeed={setSeed}
         />
       </div>
     </>

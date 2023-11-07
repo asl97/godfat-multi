@@ -5,6 +5,7 @@ import { godfatCss } from "./utils/godfat";
 import styled from "@emotion/styled";
 import { ConfigData } from "./Page";
 import { CatCell } from "./utils/godfatParsing";
+import { useStorageLinkedString } from "./utils/config";
 
 const zip = (arr: any[]) =>
   Array(Math.min(...arr.map((a) => a.length)))
@@ -42,10 +43,12 @@ export default function TrackContainer({
   track,
   configData,
   cells,
+  setSeed,
 }: {
   track: "A" | "B";
   configData: ConfigData;
   cells: CatCell[][];
+  setSeed: (seed: string) => void;
 }) {
   const zippedCells: CatCell[][] = zip(cells);
   const isGuaranteedArray = zippedCells[0].map((catCell) =>
@@ -93,9 +96,15 @@ export default function TrackContainer({
                     return (
                       <Fragment key={j}>
                         <TopTd color={catCell.color}>
-                          {isTrackSwitchCell
-                            ? catCell.mainCat.text
-                            : catCell.altCat?.text}
+                          <a
+                            onClick={() => {
+                              setSeed("123");
+                            }}
+                          >
+                            {isTrackSwitchCell
+                              ? catCell.mainCat.text
+                              : catCell.altCat?.text}
+                          </a>
                         </TopTd>
                         {isGuaranteeCell && (
                           <TopTd color={catCell.guaranteeColor}>

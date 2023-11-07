@@ -26,11 +26,16 @@ const Row = styled.div`
 export default function ConfigContainer({
   banners,
   setConfigData,
+  seed,
+  setSeed,
+  forceReload,
 }: {
   banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
+  seed: string;
+  setSeed: (seed: string) => void;
+  forceReload: number;
 }) {
-  const [seed, setSeed] = useStorageLinkedString("seed");
   const [overrideSeeds, setOverrideSeeds] =
     useStorageLinkedBoolean("overrideSeeds");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
@@ -75,6 +80,12 @@ export default function ConfigContainer({
     });
     setConfigData({ bannerData });
   };
+
+  useEffect(() => {
+    try {
+      onSubmit();
+    } catch (e) {}
+  }, [forceReload]);
 
   return (
     <div>
