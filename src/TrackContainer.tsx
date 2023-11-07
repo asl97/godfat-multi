@@ -21,14 +21,14 @@ const TopTd = styled.td<{ color?: string }>`
   border: 1px solid black;
   border-bottom-style: none;
   ${({ color }) => `background-color: ${color};`}
-  ${({ color }) => (color === "darkviolet" ? `color: #d8a56f;` : "")}
+  ${({ color }) => (color === "darkviolet" ? `color: #d8a56f; !important` : "")}
 `;
 
 const BottomTd = styled.td<{ color?: string }>`
   border: 1px solid black;
   border-top-style: none;
   ${({ color }) => `background-color: ${color};`}
-  ${({ color }) => (color === "darkviolet" ? `color: #d8a56f;` : "")}
+  ${({ color }) => (color === "darkviolet" ? `color: #d8a56f !important;` : "")}
 `;
 
 const StickyRow = styled.tr`
@@ -38,6 +38,35 @@ const StickyRow = styled.tr`
   box-shadow: inset 0 1px 0 black, inset 0 -1px 0 black, inset 1px 0 0 black,
     inset -1px 0 0 black;
 `;
+
+const CatAnchor = ({
+  cat,
+  setSeed,
+}: {
+  cat?: {
+    text: string;
+    href: string;
+  };
+  setSeed: (seed: string) => void;
+}) => {
+  if (!cat) {
+    return null;
+  }
+  return (
+    <a
+      css={{ cursor: "pointer", ":hover": { textDecoration: "underline" } }}
+      onClick={(e) => {
+        const destinationSeed = new URL(cat.href)?.searchParams?.get("seed");
+        if (destinationSeed) {
+          setSeed(destinationSeed);
+        }
+        e.preventDefault();
+      }}
+    >
+      {cat.text}
+    </a>
+  );
+};
 
 export default function TrackContainer({
   track,
@@ -96,21 +125,31 @@ export default function TrackContainer({
                     return (
                       <Fragment key={j}>
                         <TopTd color={catCell.color}>
-                          <a
-                            onClick={() => {
-                              setSeed("123");
-                            }}
-                          >
-                            {isTrackSwitchCell
-                              ? catCell.mainCat.text
-                              : catCell.altCat?.text}
-                          </a>
+                          {isTrackSwitchCell ? (
+                            <CatAnchor
+                              cat={catCell.mainCat}
+                              setSeed={setSeed}
+                            ></CatAnchor>
+                          ) : (
+                            <CatAnchor
+                              cat={catCell.altCat}
+                              setSeed={setSeed}
+                            ></CatAnchor>
+                          )}
                         </TopTd>
                         {isGuaranteeCell && (
                           <TopTd color={catCell.guaranteeColor}>
-                            {isTrackSwitchCell
-                              ? catCell.guaranteeMainCat?.text
-                              : catCell.guaranteeAltCat?.text}
+                            {isTrackSwitchCell ? (
+                              <CatAnchor
+                                cat={catCell.guaranteeMainCat}
+                                setSeed={setSeed}
+                              ></CatAnchor>
+                            ) : (
+                              <CatAnchor
+                                cat={catCell.guaranteeAltCat}
+                                setSeed={setSeed}
+                              ></CatAnchor>
+                            )}
                           </TopTd>
                         )}
                       </Fragment>
@@ -125,15 +164,31 @@ export default function TrackContainer({
                     return (
                       <Fragment key={j}>
                         <BottomTd color={catCell.color}>
-                          {isTrackSwitchCell
-                            ? catCell.altCat?.text
-                            : catCell.mainCat.text}
+                          {isTrackSwitchCell ? (
+                            <CatAnchor
+                              cat={catCell.altCat}
+                              setSeed={setSeed}
+                            ></CatAnchor>
+                          ) : (
+                            <CatAnchor
+                              cat={catCell.mainCat}
+                              setSeed={setSeed}
+                            ></CatAnchor>
+                          )}
                         </BottomTd>
                         {isGuaranteeCell && (
                           <BottomTd color={catCell.guaranteeColor}>
-                            {isTrackSwitchCell
-                              ? catCell.guaranteeAltCat?.text
-                              : catCell.guaranteeMainCat?.text}
+                            {isTrackSwitchCell ? (
+                              <CatAnchor
+                                cat={catCell.guaranteeAltCat}
+                                setSeed={setSeed}
+                              ></CatAnchor>
+                            ) : (
+                              <CatAnchor
+                                cat={catCell.guaranteeMainCat}
+                                setSeed={setSeed}
+                              ></CatAnchor>
+                            )}
                           </BottomTd>
                         )}
                       </Fragment>
