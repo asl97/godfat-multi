@@ -106,39 +106,46 @@ export default function TracksContainer({
     return <></>;
   }
 
-  const queryData = JSON.parse(JSON.stringify(parsedQueryData));
+  // Deep clone parsedQueryData, so changes don't get persisted on rerender
+  const queryData: {
+    trackAs: CatCell[][];
+    trackBs: CatCell[][];
+  } = JSON.parse(JSON.stringify(parsedQueryData));
 
+  // Highlight cats that will be pulled if a cell is clicked
   if (selectedCell) {
     const { bannerUrl, num, track, isMainCat, isGuaranteed } =
       desSelectedCell(selectedCell);
 
+    // Isolate the current banner and track
     const trackIndex = configData.bannerData.findIndex(
       (data) => data.url === bannerUrl
     );
-
     let currentTrackList =
       track === "A"
         ? queryData.trackAs[trackIndex]
         : queryData.trackBs[trackIndex];
 
-    let guaranteedDestinationRow = null;
+    // If the cell is a guaranteed, highlight it and find the destination
+    let guaranteedDestinationNum = null;
     let guaranteedDestinationTrack = null;
     if (isGuaranteed) {
       const currentCatCell = currentTrackList[num - 1];
       if (isMainCat) {
         currentCatCell.guaranteeMainCat!.backgroundType = "selected";
-        guaranteedDestinationRow =
+        guaranteedDestinationNum =
           currentCatCell.guaranteeMainCat?.destinationRow;
         guaranteedDestinationTrack =
           currentCatCell.guaranteeMainCat?.destinationTrack;
       } else {
         currentCatCell.guaranteeAltCat!.backgroundType = "selected";
-        guaranteedDestinationRow =
+        guaranteedDestinationNum =
           currentCatCell.guaranteeAltCat?.destinationRow;
         guaranteedDestinationTrack =
           currentCatCell.guaranteeAltCat?.destinationTrack;
       }
     }
+
     // If not main cat, set lastCatName to a dupe to force the alt track
     let lastCatName = isMainCat ? "" : currentTrackList[num - 1].mainCat.name;
     let currentNum = num;
@@ -170,31 +177,51 @@ export default function TracksContainer({
         currentTrack = currentCatCell.altCat!.destinationTrack as "A" | "B";
         currentCat = currentCatCell.altCat!;
       }
+      // Highlight the cat
       currentCat.backgroundType = "selected";
       numRolls += 1;
 
+      // Exit conditions
       if (isGuaranteed) {
-        // STOP WHEN: IF (ends on A) THEN (when we get to i-1B) IF (ends on B) THEN (when we get to iA)
+        // Stop when: IF (ends on A) THEN (when we get to i-1B) ELSE IF (ends on B) THEN (when we get to iA)
         if (
           (guaranteedDestinationTrack === "A" &&
-            currentNum + 1 === guaranteedDestinationRow &&
+            currentNum + 1 === guaranteedDestinationNum &&
             currentTrack === "B") ||
           (guaranteedDestinationTrack === "B" &&
-            currentNum === guaranteedDestinationRow &&
+            currentNum === guaranteedDestinationNum &&
             currentTrack === "A")
         ) {
-          const guaranteedCatCell = (
-            guaranteedDestinationTrack === "A"
-              ? queryData.trackAs
-              : queryData.trackBs
-          )[trackIndex][guaranteedDestinationRow - 1];
-          guaranteedCatCell.mainCat.backgroundType = "next";
           break;
         }
       } else {
-        if (numRolls === 2) {
-          currentCat.backgroundType = "next";
+        // For non-guaranteed cells, just stop after one pull
+        if (numRolls === 1) {
           break;
+        }
+      }
+    }
+
+    // Highlight the entire destination row
+    const nextCatNum = isGuaranteed ? guaranteedDestinationNum : currentNum;
+    const nextCatTrack = isGuaranteed
+      ? guaranteedDestinationTrack
+      : currentTrack;
+    const allTracks =
+      nextCatTrack === "A" ? queryData.trackAs : queryData.trackBs;
+    for (const track of allTracks) {
+      const catCell = track[nextCatNum! - 1];
+      if (catCell) {
+        const isRareDupe =
+          catCell.color === "white" && catCell.mainCat.name === lastCatName;
+        if (!isRareDupe) {
+          // Highlight the main and guaranteed main cats
+          catCell.mainCat.backgroundType = "next";
+          catCell.guaranteeMainCat!.backgroundType = "next";
+        } else {
+          // Highlight the alt and guaranteed alt cats
+          catCell.altCat!.backgroundType = "next";
+          catCell.guaranteeAltCat!.backgroundType = "next";
         }
       }
     }
