@@ -52,12 +52,15 @@ export default function Page() {
     setSeed(seed);
     setForceReload((forceReload) => forceReload + 1);
   };
+
   const [mode, setMode] = useStorageLinkedString("mode");
-  // The planning function is used across config and tracks
+  const [selectedCell, setSelectedCell] = useState("");
+  const resetSelectedCell = () => setSelectedCell("");
   const [plannedCells, setPlannedCells] = useState<string[]>([]);
   const addPlannedCell = (cell: string) => {
     setPlannedCells((plannedCells) => [...plannedCells, cell]);
   };
+  const resetPlannedCells = () => setPlannedCells([]);
 
   const [configData, setConfigData] = React.useState<ConfigData>({
     bannerData: [],
@@ -82,12 +85,17 @@ export default function Page() {
         forceReload={forceReload}
         mode={mode}
         setMode={setMode}
+        resetSelectedCell={resetSelectedCell}
+        resetPlannedCells={resetPlannedCells}
       />
       <TracksContainer
         plannedCells={plannedCells}
         addPlannedCell={addPlannedCell}
+        resetPlannedCells={resetPlannedCells}
         banners={banners}
         configData={configData}
+        selectedCell={selectedCell}
+        setSelectedCell={setSelectedCell}
         setSeed={setSeedAndForceReload}
         mode={mode}
       />

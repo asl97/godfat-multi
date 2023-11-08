@@ -44,6 +44,8 @@ export default function ConfigContainer({
   forceReload,
   mode,
   setMode,
+  resetSelectedCell,
+  resetPlannedCells,
 }: {
   banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
@@ -52,6 +54,8 @@ export default function ConfigContainer({
   forceReload: number;
   mode: string;
   setMode: (mode: string) => void;
+  resetSelectedCell: () => void;
+  resetPlannedCells: () => void;
 }) {
   const [count, setCount] = useStorageLinkedNumber("count");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
@@ -169,8 +173,10 @@ export default function ConfigContainer({
                 onChange={() => {
                   if (mode === "plan") {
                     setMode("simulate");
+                    resetPlannedCells();
                   } else {
                     setMode("plan");
+                    resetSelectedCell();
                   }
                 }}
               />

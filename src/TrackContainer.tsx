@@ -16,7 +16,11 @@ const LabelTd = styled.td`
   background-color: #f5f5f5;
 `;
 
-const TopTd = styled.td<{ color?: string; backgroundType?: string }>`
+const TopTd = styled.td<{
+  color?: string;
+  backgroundType?: string;
+  planBackgroundType?: string;
+}>`
   cursor: pointer;
   border: 1px solid black;
   border-bottom-style: none;
@@ -26,16 +30,25 @@ const TopTd = styled.td<{ color?: string; backgroundType?: string }>`
     }
     return `background-color: ${color};`;
   }}
-  ${({ backgroundType }) => {
+  ${({ backgroundType, planBackgroundType }) => {
+    if (planBackgroundType === "selected") {
+      return `background-image: linear-gradient(#0000ff50, #0000ff50);`;
+    } else if (planBackgroundType === "next") {
+      return `background-image: repeating-linear-gradient(90deg, #0000ff54  5px, #0000ff55 15px, #0000ff33 15px, #0000ff33 25px)`;
+    }
     if (backgroundType === "selected") {
-      return `background-image: linear-gradient(#00000033, #00000033);`;
+      return `background-image: linear-gradient(#00000050, #00000050);`;
     } else if (backgroundType === "next") {
       return `background-image: repeating-linear-gradient(90deg, #00000055  5px, #00000055 15px, #00000033 15px, #00000033 25px)`;
     }
   }}
 `;
 
-const BottomTd = styled.td<{ color?: string; backgroundType?: string }>`
+const BottomTd = styled.td<{
+  color?: string;
+  backgroundType?: string;
+  planBackgroundType?: string;
+}>`
   cursor: pointer;
   border: 1px solid black;
   border-top-style: none;
@@ -45,9 +58,14 @@ const BottomTd = styled.td<{ color?: string; backgroundType?: string }>`
     }
     return `background-color: ${color};`;
   }}
-  ${({ backgroundType }) => {
+  ${({ backgroundType, planBackgroundType }) => {
+    if (planBackgroundType === "selected") {
+      return `background-image: linear-gradient(#0000ff50, #0000ff50);`;
+    } else if (planBackgroundType === "next") {
+      return `background-image: repeating-linear-gradient(90deg, #0000ff54  5px, #0000ff55 15px, #0000ff33 15px, #0000ff33 25px)`;
+    }
     if (backgroundType === "selected") {
-      return `background-image: linear-gradient(#00000033, #00000033);`;
+      return `background-image: linear-gradient(#00000050, #00000050);`;
     } else if (backgroundType === "next") {
       return `background-image: repeating-linear-gradient(90deg, #00000055  5px, #00000055 15px, #00000033 15px, #00000033 25px)`;
     }
@@ -98,6 +116,7 @@ export default function TrackContainer({
   setSeed,
   setSelectedCell,
   addPlannedCell,
+  mode,
 }: {
   track: "A" | "B";
   configData: ConfigData;
@@ -105,6 +124,7 @@ export default function TrackContainer({
   setSeed: (seed: string) => void;
   setSelectedCell: (selectedCell: string) => void;
   addPlannedCell: (plannedCell: string) => void;
+  mode: string;
 }) {
   const zippedCells: CatCell[][] = zip(cells);
   const isGuaranteedArray = zippedCells[0].map((catCell) =>
@@ -160,11 +180,20 @@ export default function TrackContainer({
                               isMainCat: true,
                               isGuaranteed: false,
                             });
-                            setSelectedCell(serializedCell);
-                            addPlannedCell(serializedCell);
+                            if (mode === "simulate") {
+                              setSelectedCell(serializedCell);
+                            } else if (
+                              mode === "plan" &&
+                              catCell.mainCat?.planBackgroundType === "next"
+                            ) {
+                              addPlannedCell(serializedCell);
+                            }
                           }}
                           color={catCell.color}
                           backgroundType={catCell.mainCat?.backgroundType}
+                          planBackgroundType={
+                            catCell.mainCat?.planBackgroundType
+                          }
                         >
                           {isTrackSwitchCell ? (
                             <CatAnchor
@@ -188,12 +217,22 @@ export default function TrackContainer({
                                 isMainCat: true,
                                 isGuaranteed: true,
                               });
-                              setSelectedCell(serializedCell);
-                              addPlannedCell(serializedCell);
+                              if (mode === "simulate") {
+                                setSelectedCell(serializedCell);
+                              } else if (
+                                mode === "plan" &&
+                                catCell.guaranteeMainCat?.planBackgroundType ===
+                                  "next"
+                              ) {
+                                addPlannedCell(serializedCell);
+                              }
                             }}
                             color={catCell.guaranteeColor}
                             backgroundType={
                               catCell.guaranteeMainCat?.backgroundType
+                            }
+                            planBackgroundType={
+                              catCell.guaranteeMainCat?.planBackgroundType
                             }
                           >
                             {isTrackSwitchCell ? (
@@ -229,14 +268,28 @@ export default function TrackContainer({
                               isMainCat: !isTrackSwitchCell,
                               isGuaranteed: false,
                             });
-                            setSelectedCell(serializedCell);
-                            addPlannedCell(serializedCell);
+                            if (mode === "simulate") {
+                              setSelectedCell(serializedCell);
+                            } else if (
+                              mode === "plan" &&
+                              (isTrackSwitchCell
+                                ? catCell.altCat
+                                : catCell.mainCat
+                              )?.planBackgroundType === "next"
+                            ) {
+                              addPlannedCell(serializedCell);
+                            }
                           }}
                           color={catCell.color}
                           backgroundType={
                             isTrackSwitchCell
                               ? catCell.altCat?.backgroundType
                               : catCell.mainCat?.backgroundType
+                          }
+                          planBackgroundType={
+                            isTrackSwitchCell
+                              ? catCell.altCat?.planBackgroundType
+                              : catCell.mainCat?.planBackgroundType
                           }
                         >
                           {isTrackSwitchCell ? (
@@ -261,14 +314,28 @@ export default function TrackContainer({
                                 isMainCat: !isTrackSwitchCell,
                                 isGuaranteed: true,
                               });
-                              setSelectedCell(serializedCell);
-                              addPlannedCell(serializedCell);
+                              if (mode === "simulate") {
+                                setSelectedCell(serializedCell);
+                              } else if (
+                                mode === "plan" &&
+                                (isTrackSwitchCell
+                                  ? catCell.guaranteeAltCat
+                                  : catCell.guaranteeMainCat
+                                )?.planBackgroundType === "next"
+                              ) {
+                                addPlannedCell(serializedCell);
+                              }
                             }}
                             color={catCell.guaranteeColor}
                             backgroundType={
                               isTrackSwitchCell
                                 ? catCell.guaranteeAltCat?.backgroundType
                                 : catCell.guaranteeMainCat?.backgroundType
+                            }
+                            planBackgroundType={
+                              isTrackSwitchCell
+                                ? catCell.guaranteeAltCat?.planBackgroundType
+                                : catCell.guaranteeMainCat?.planBackgroundType
                             }
                           >
                             {isTrackSwitchCell ? (

@@ -5,7 +5,7 @@ import { ConfigData } from "./Page";
 import { useQueries } from "react-query";
 import { corsUrl } from "./utils/query";
 import { Typography } from "@mui/material";
-import { CatCell, extractCatsFromTable } from "./utils/godfatParsing";
+import { CatCell, CatData, extractCatsFromTable } from "./utils/godfatParsing";
 import { BannerSelectOption, urlToRareCatQueryUrl } from "./utils/godfat";
 import { desSelectedCell } from "./utils/cellSelection";
 
@@ -20,18 +20,33 @@ type QueryData = {
 };
 
 const handleCellSelection = ({
+  mode,
   queryData,
   selectedCell,
   configData,
   rareCats,
+  highlightNext,
 }: {
+  mode: string;
   queryData: QueryData;
   selectedCell: string;
   configData: ConfigData;
   rareCats: Set<string>;
+  highlightNext: boolean;
 }) => {
   const { bannerUrl, num, track, isMainCat, isGuaranteed } =
     desSelectedCell(selectedCell);
+
+  const setCellBackground = (cell: CatData, type: "selected" | "next") => {
+    if (!cell) {
+      return;
+    }
+    if (mode === "simulate") {
+      cell.backgroundType = type;
+    } else if (mode === "plan") {
+      cell.planBackgroundType = type;
+    }
+  };
 
   // Isolate the current banner and track
   const trackIndex = configData.bannerData.findIndex(
@@ -48,13 +63,13 @@ const handleCellSelection = ({
   if (isGuaranteed) {
     const currentCatCell = currentTrackList[num - 1];
     if (isMainCat) {
-      currentCatCell.guaranteeMainCat!.backgroundType = "selected";
+      setCellBackground(currentCatCell.guaranteeMainCat!, "selected");
       guaranteedDestinationNum =
         currentCatCell.guaranteeMainCat?.destinationRow;
       guaranteedDestinationTrack =
         currentCatCell.guaranteeMainCat?.destinationTrack;
     } else {
-      currentCatCell.guaranteeAltCat!.backgroundType = "selected";
+      setCellBackground(currentCatCell.guaranteeAltCat!, "selected");
       guaranteedDestinationNum = currentCatCell.guaranteeAltCat?.destinationRow;
       guaranteedDestinationTrack =
         currentCatCell.guaranteeAltCat?.destinationTrack;
@@ -93,7 +108,7 @@ const handleCellSelection = ({
       currentCat = currentCatCell.altCat!;
     }
     // Highlight the cat
-    currentCat.backgroundType = "selected";
+    setCellBackground(currentCat, "selected");
     numRolls += 1;
 
     // Exit conditions
@@ -118,24 +133,28 @@ const handleCellSelection = ({
   }
 
   // Highlight the entire destination row
-  const nextCatNum = isGuaranteed ? guaranteedDestinationNum : currentNum;
-  const nextCatTrack = isGuaranteed ? guaranteedDestinationTrack : currentTrack;
-  const allTracks =
-    nextCatTrack === "A" ? queryData.trackAs : queryData.trackBs;
-  for (const track of allTracks) {
-    const catCell = track[nextCatNum! - 1];
-    if (catCell) {
-      const isRareDupe =
-        rareCats.has(catCell.mainCat.name) &&
-        catCell.mainCat.name === lastCatName;
-      if (!isRareDupe) {
-        // Highlight the main and guaranteed main cats
-        catCell.mainCat.backgroundType = "next";
-        catCell.guaranteeMainCat!.backgroundType = "next";
-      } else {
-        // Highlight the alt and guaranteed alt cats
-        catCell.altCat!.backgroundType = "next";
-        catCell.guaranteeAltCat!.backgroundType = "next";
+  if (highlightNext) {
+    const nextCatNum = isGuaranteed ? guaranteedDestinationNum : currentNum;
+    const nextCatTrack = isGuaranteed
+      ? guaranteedDestinationTrack
+      : currentTrack;
+    const allTracks =
+      nextCatTrack === "A" ? queryData.trackAs : queryData.trackBs;
+    for (const track of allTracks) {
+      const catCell = track[nextCatNum! - 1];
+      if (catCell) {
+        const isRareDupe =
+          rareCats.has(catCell.mainCat.name) &&
+          catCell.mainCat.name === lastCatName;
+        if (!isRareDupe) {
+          // Highlight the main and guaranteed main cats
+          setCellBackground(catCell.mainCat, "next");
+          setCellBackground(catCell.guaranteeMainCat!, "next");
+        } else {
+          // Highlight the alt and guaranteed alt cats
+          setCellBackground(catCell.altCat!, "next");
+          setCellBackground(catCell.guaranteeAltCat!, "next");
+        }
       }
     }
   }
@@ -145,19 +164,23 @@ export default function TracksContainer({
   banners,
   configData,
   setSeed,
+  selectedCell,
+  setSelectedCell,
   plannedCells,
   addPlannedCell,
+  resetPlannedCells,
   mode,
 }: {
   banners: BannerSelectOption[];
   configData: ConfigData;
   setSeed: (seed: string) => void;
+  selectedCell: string;
+  setSelectedCell: (cell: string) => void;
   plannedCells: string[];
   addPlannedCell: (cell: string) => void;
+  resetPlannedCells: () => void;
   mode: string;
 }) {
-  const [selectedCell, setSelectedCell] = useState("");
-
   const urls = configData.bannerData.map((data) => data.url);
   const [parsedQueryData, setParsedQueryData] = useState<QueryData>({
     trackAs: [],
@@ -226,6 +249,7 @@ export default function TracksContainer({
       setRareCats(rareCatSet);
 
       setSelectedCell("");
+      resetPlannedCells();
     })();
 
     return () => {};
@@ -246,14 +270,38 @@ export default function TracksContainer({
   // Deep clone parsedQueryData, so changes don't get persisted on rerender
   const queryData: QueryData = JSON.parse(JSON.stringify(parsedQueryData));
 
-  // Highlight cats that will be pulled if a cell is clicked
-  if (selectedCell) {
-    handleCellSelection({
-      queryData,
-      selectedCell,
-      configData,
-      rareCats,
-    });
+  if (mode === "simulate") {
+    if (selectedCell) {
+      handleCellSelection({
+        mode,
+        queryData,
+        selectedCell,
+        configData,
+        rareCats,
+        highlightNext: true,
+      });
+    }
+  } else if (mode === "plan") {
+    if (plannedCells.length === 0) {
+      // Set 1A as "next" to start off
+      for (const trackList of queryData.trackAs) {
+        trackList[0].mainCat.planBackgroundType = "next";
+        if (trackList[0].guaranteeMainCat) {
+          trackList[0].guaranteeMainCat.planBackgroundType = "next";
+        }
+      }
+    } else {
+      for (const [index, plannedCell] of plannedCells.entries()) {
+        handleCellSelection({
+          mode,
+          queryData,
+          selectedCell: plannedCell,
+          configData,
+          rareCats,
+          highlightNext: index === plannedCells.length - 1,
+        });
+      }
+    }
   }
 
   return (
@@ -273,6 +321,7 @@ export default function TracksContainer({
           setSeed={setSeed}
           setSelectedCell={setSelectedCell}
           addPlannedCell={addPlannedCell}
+          mode={mode}
         />
         <TrackContainer
           track="B"
@@ -281,6 +330,7 @@ export default function TracksContainer({
           setSeed={setSeed}
           setSelectedCell={setSelectedCell}
           addPlannedCell={addPlannedCell}
+          mode={mode}
         />
       </div>
     </>

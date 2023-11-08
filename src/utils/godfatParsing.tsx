@@ -1,4 +1,4 @@
-type CatData = {
+export type CatData = {
   text: string;
   name: string;
   destinationRow: number;
