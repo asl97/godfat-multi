@@ -60,6 +60,8 @@ export default function Page() {
   const addPlannedCell = (cell: string) => {
     setPlannedCells((plannedCells) => [...plannedCells, cell]);
   };
+  const undoPlannedCell = () =>
+    setPlannedCells((plannedCells) => plannedCells.slice(0, -1));
   const resetPlannedCells = () => setPlannedCells([]);
 
   const [configData, setConfigData] = React.useState<ConfigData>({
@@ -87,6 +89,7 @@ export default function Page() {
         setMode={setMode}
         resetSelectedCell={resetSelectedCell}
         resetPlannedCells={resetPlannedCells}
+        undoPlannedCell={undoPlannedCell}
       />
       <TracksContainer
         plannedCells={plannedCells}

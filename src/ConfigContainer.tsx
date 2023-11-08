@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { useEffect } from "react";
+import React, { Fragment, useEffect } from "react";
 import {
   BannerSelectOption,
   augmentGodfatUrlWithGlobalConfig,
@@ -46,6 +46,7 @@ export default function ConfigContainer({
   setMode,
   resetSelectedCell,
   resetPlannedCells,
+  undoPlannedCell,
 }: {
   banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
@@ -56,6 +57,7 @@ export default function ConfigContainer({
   setMode: (mode: string) => void;
   resetSelectedCell: () => void;
   resetPlannedCells: () => void;
+  undoPlannedCell: () => void;
 }) {
   const [count, setCount] = useStorageLinkedNumber("count");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
@@ -165,24 +167,47 @@ export default function ConfigContainer({
           <Typography css={{ color: "rgba(0, 0, 0, 0.6)" }} variant="caption">
             Planning Mode
           </Typography>
-          <FormControlLabel
-            control={
-              <Switch
-                css={{ marginLeft: "4px" }}
-                checked={mode === "plan"}
-                onChange={() => {
-                  if (mode === "plan") {
-                    setMode("simulate");
-                    resetPlannedCells();
-                  } else {
-                    setMode("plan");
-                    resetSelectedCell();
-                  }
-                }}
-              />
-            }
-            label={`${mode === "plan" ? "ON" : "OFF"}`}
-          />
+          <div css={{ display: "flex", alignItems: "center" }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  css={{ marginLeft: "4px" }}
+                  checked={mode === "plan"}
+                  onChange={() => {
+                    if (mode === "plan") {
+                      setMode("simulate");
+                      resetPlannedCells();
+                    } else {
+                      setMode("plan");
+                      resetSelectedCell();
+                    }
+                  }}
+                />
+              }
+              label={`${mode === "plan" ? "ON" : "OFF"}`}
+            />
+            {mode === "plan" && (
+              <Fragment>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  css={{ marginLeft: "12px", height: "fit-content" }}
+                  onClick={() => undoPlannedCell()}
+                >
+                  Undo
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="error"
+                  css={{ marginLeft: "12px", height: "fit-content" }}
+                  onClick={() => resetPlannedCells()}
+                >
+                  Reset
+                </Button>
+              </Fragment>
+            )}
+          </div>
           <Typography css={{ color: "rgba(0, 0, 0, 0.6)" }} variant="caption">
             {mode === "plan" ? (
               <i>
@@ -191,7 +216,8 @@ export default function ConfigContainer({
               </i>
             ) : (
               <i>
-                (clicking cells will <strong>simulate rolls</strong>)
+                (clicking <strong>any</strong> cells will{" "}
+                <strong>simulate rolls</strong>)
               </i>
             )}
           </Typography>
@@ -212,7 +238,7 @@ export default function ConfigContainer({
         />
       ))}
       <Row>
-        <Button variant="contained" onClick={() => onSubmit()}>
+        <Button variant="contained" disableElevation onClick={() => onSubmit()}>
           Submit / Update
         </Button>
       </Row>
