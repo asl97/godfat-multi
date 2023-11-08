@@ -32,6 +32,8 @@ const globalCss = css`
   td {
     white-space: nowrap;
     text-align: center;
+    padding-left: 8px;
+    padding-right: 8px;
   }
   th {
     border: 1px solid black;
