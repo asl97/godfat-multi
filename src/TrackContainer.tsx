@@ -14,6 +14,7 @@ const zip = (arr: any[]) =>
 const LabelTd = styled.td`
   border: 1px solid black;
   background-color: #f5f5f5;
+  padding: 1px !important;
 `;
 
 const TopTd = styled.td<{
