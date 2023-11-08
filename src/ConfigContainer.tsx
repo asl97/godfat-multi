@@ -1,3 +1,4 @@
+/** @jsx jsx */
 import React, { useEffect } from "react";
 import {
   BannerSelectOption,
@@ -5,6 +6,7 @@ import {
   sanitizeGodfatUrl,
 } from "./utils/godfat";
 import UrlInput from "./UrlInput";
+import { jsx } from "@emotion/react";
 import {
   Button,
   Checkbox,
@@ -12,7 +14,9 @@ import {
   FormControlLabel,
   InputLabel,
   Select,
+  Switch,
   TextField,
+  Typography,
 } from "@mui/material";
 import styled from "@emotion/styled";
 import { BannerData, ConfigData } from "./Page";
@@ -38,12 +42,16 @@ export default function ConfigContainer({
   seed,
   setSeed,
   forceReload,
+  mode,
+  setMode,
 }: {
   banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
   seed: string;
   setSeed: (seed: string) => void;
   forceReload: number;
+  mode: string;
+  setMode: (mode: string) => void;
 }) {
   const [count, setCount] = useStorageLinkedNumber("count");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
@@ -139,6 +147,49 @@ export default function ConfigContainer({
             </option>
           </Select>
         </FormControl>
+      </Row>
+      <Row>
+        <div
+          css={{
+            display: "flex",
+            flexDirection: "column",
+            padding: "2px 8px",
+            borderRadius: "4px",
+            border: "1px solid rgba(0, 0, 0, 0.23)",
+          }}
+        >
+          <Typography css={{ color: "rgba(0, 0, 0, 0.6)" }} variant="caption">
+            Planning Mode
+          </Typography>
+          <FormControlLabel
+            control={
+              <Switch
+                css={{ marginLeft: "4px" }}
+                checked={mode === "plan"}
+                onChange={() => {
+                  if (mode === "plan") {
+                    setMode("simulate");
+                  } else {
+                    setMode("plan");
+                  }
+                }}
+              />
+            }
+            label={`${mode === "plan" ? "ON" : "OFF"}`}
+          />
+          <Typography css={{ color: "rgba(0, 0, 0, 0.6)" }} variant="caption">
+            {mode === "plan" ? (
+              <i>
+                (clicking <strong>striped</strong> cells will{" "}
+                <strong>continue the chain</strong>)
+              </i>
+            ) : (
+              <i>
+                (clicking cells will <strong>simulate rolls</strong>)
+              </i>
+            )}
+          </Typography>
+        </div>
       </Row>
       <Row>
         <Button variant="outlined" onClick={addNewInput}>

@@ -52,6 +52,7 @@ export default function Page() {
     setSeed(seed);
     setForceReload((forceReload) => forceReload + 1);
   };
+  const [mode, setMode] = useStorageLinkedString("mode");
   // The planning function is used across config and tracks
   const [plannedCells, setPlannedCells] = useState<string[]>([]);
   const addPlannedCell = (cell: string) => {
@@ -79,6 +80,8 @@ export default function Page() {
         seed={seed}
         setSeed={setSeed}
         forceReload={forceReload}
+        mode={mode}
+        setMode={setMode}
       />
       <TracksContainer
         plannedCells={plannedCells}
@@ -86,6 +89,7 @@ export default function Page() {
         banners={banners}
         configData={configData}
         setSeed={setSeedAndForceReload}
+        mode={mode}
       />
     </div>
   );

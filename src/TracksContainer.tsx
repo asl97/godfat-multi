@@ -147,12 +147,14 @@ export default function TracksContainer({
   setSeed,
   plannedCells,
   addPlannedCell,
+  mode,
 }: {
   banners: BannerSelectOption[];
   configData: ConfigData;
   setSeed: (seed: string) => void;
   plannedCells: string[];
   addPlannedCell: (cell: string) => void;
+  mode: string;
 }) {
   const [selectedCell, setSelectedCell] = useState("");
 
@@ -270,6 +272,7 @@ export default function TracksContainer({
           cells={queryData.trackAs}
           setSeed={setSeed}
           setSelectedCell={setSelectedCell}
+          addPlannedCell={addPlannedCell}
         />
         <TrackContainer
           track="B"
@@ -277,6 +280,7 @@ export default function TracksContainer({
           cells={queryData.trackBs}
           setSeed={setSeed}
           setSelectedCell={setSelectedCell}
+          addPlannedCell={addPlannedCell}
         />
       </div>
     </>

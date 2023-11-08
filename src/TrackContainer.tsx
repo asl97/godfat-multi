@@ -97,12 +97,14 @@ export default function TrackContainer({
   cells,
   setSeed,
   setSelectedCell,
+  addPlannedCell,
 }: {
   track: "A" | "B";
   configData: ConfigData;
   cells: CatCell[][];
   setSeed: (seed: string) => void;
   setSelectedCell: (selectedCell: string) => void;
+  addPlannedCell: (plannedCell: string) => void;
 }) {
   const zippedCells: CatCell[][] = zip(cells);
   const isGuaranteedArray = zippedCells[0].map((catCell) =>
@@ -151,15 +153,15 @@ export default function TrackContainer({
                       <Fragment key={j}>
                         <TopTd
                           onClick={() => {
-                            setSelectedCell(
-                              serSelectedCell({
-                                bannerUrl: configData.bannerData[j].url,
-                                num: i + 1,
-                                track,
-                                isMainCat: true,
-                                isGuaranteed: false,
-                              })
-                            );
+                            const serializedCell = serSelectedCell({
+                              bannerUrl: configData.bannerData[j].url,
+                              num: i + 1,
+                              track,
+                              isMainCat: true,
+                              isGuaranteed: false,
+                            });
+                            setSelectedCell(serializedCell);
+                            addPlannedCell(serializedCell);
                           }}
                           color={catCell.color}
                           backgroundType={catCell.mainCat?.backgroundType}
@@ -179,15 +181,15 @@ export default function TrackContainer({
                         {isGuaranteeCell && (
                           <TopTd
                             onClick={() => {
-                              setSelectedCell(
-                                serSelectedCell({
-                                  bannerUrl: configData.bannerData[j].url,
-                                  num: i + 1,
-                                  track,
-                                  isMainCat: true,
-                                  isGuaranteed: true,
-                                })
-                              );
+                              const serializedCell = serSelectedCell({
+                                bannerUrl: configData.bannerData[j].url,
+                                num: i + 1,
+                                track,
+                                isMainCat: true,
+                                isGuaranteed: true,
+                              });
+                              setSelectedCell(serializedCell);
+                              addPlannedCell(serializedCell);
                             }}
                             color={catCell.guaranteeColor}
                             backgroundType={
@@ -220,15 +222,15 @@ export default function TrackContainer({
                       <Fragment key={j}>
                         <BottomTd
                           onClick={() => {
-                            setSelectedCell(
-                              serSelectedCell({
-                                bannerUrl: configData.bannerData[j].url,
-                                num: i + 1,
-                                track,
-                                isMainCat: !isTrackSwitchCell,
-                                isGuaranteed: false,
-                              })
-                            );
+                            const serializedCell = serSelectedCell({
+                              bannerUrl: configData.bannerData[j].url,
+                              num: i + 1,
+                              track,
+                              isMainCat: !isTrackSwitchCell,
+                              isGuaranteed: false,
+                            });
+                            setSelectedCell(serializedCell);
+                            addPlannedCell(serializedCell);
                           }}
                           color={catCell.color}
                           backgroundType={
@@ -252,15 +254,15 @@ export default function TrackContainer({
                         {isGuaranteeCell && (
                           <BottomTd
                             onClick={() => {
-                              setSelectedCell(
-                                serSelectedCell({
-                                  bannerUrl: configData.bannerData[j].url,
-                                  num: i + 1,
-                                  track,
-                                  isMainCat: !isTrackSwitchCell,
-                                  isGuaranteed: true,
-                                })
-                              );
+                              const serializedCell = serSelectedCell({
+                                bannerUrl: configData.bannerData[j].url,
+                                num: i + 1,
+                                track,
+                                isMainCat: !isTrackSwitchCell,
+                                isGuaranteed: true,
+                              });
+                              setSelectedCell(serializedCell);
+                              addPlannedCell(serializedCell);
                             }}
                             color={catCell.guaranteeColor}
                             backgroundType={

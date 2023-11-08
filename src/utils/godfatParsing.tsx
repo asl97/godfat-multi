@@ -5,6 +5,7 @@ type CatData = {
   destinationTrack: string;
   href: string;
   backgroundType?: "selected" | "next";
+  planBackgroundType?: "selected" | "next";
 };
 
 export type CatCell = {

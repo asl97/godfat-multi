@@ -6,6 +6,7 @@ const DEFAULTS = {
   lastCatId: 0,
   count: 100,
   inputKeys: [],
+  mode: "simulate",
 };
 
 const URL_INPUT_DEFAULTS = {
