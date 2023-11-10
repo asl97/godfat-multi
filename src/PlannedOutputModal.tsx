@@ -4,6 +4,7 @@ import { Box, Modal, Typography } from "@mui/material";
 import { css, jsx } from "@emotion/react";
 import { MutableRefObject } from "react";
 import { OutputEntry } from "./utils/output";
+import { useStorageLinkedString } from "./utils/config";
 
 const boxCss = css`
   position: absolute;
@@ -39,6 +40,48 @@ const collapsePlannedOutput = (plannedOutput: OutputEntry[]) => {
   return collapsed;
 };
 
+const fillSingleTemplate = (template: string, planned: OutputEntry) => {
+  return template;
+};
+
+const fillMultiTemplate = (template: string, planned: OutputEntry[]) => {
+  return template;
+};
+
+const fillGuaranteeTemplate = (template: string, planned: OutputEntry) => {
+  return template;
+};
+
+const constructPlannedOutput = ({
+  collapsedPlannedOutput,
+  singleTemplate,
+  multiTemplate,
+  guaranteeTemplate,
+}: {
+  collapsedPlannedOutput: OutputEntry[][];
+  singleTemplate: string;
+  multiTemplate: string;
+  guaranteeTemplate: string;
+}) => {
+  const resultLines: string[] = [];
+  for (const outputChunk of collapsedPlannedOutput) {
+    const first = outputChunk[0];
+    if (first.guarantee) {
+      // Guaranteed chunk
+      resultLines.push(
+        fillGuaranteeTemplate(guaranteeTemplate, outputChunk[0])
+      );
+    } else if (outputChunk.length === 1) {
+      // Single chunk
+      resultLines.push(fillSingleTemplate(singleTemplate, outputChunk[0]));
+    } else {
+      // Multi chunk
+      resultLines.push(fillMultiTemplate(multiTemplate, outputChunk));
+    }
+  }
+  return resultLines.join("\n");
+};
+
 export default function PlannedOutputModal({
   plannedOutputRef,
   open,
@@ -48,9 +91,24 @@ export default function PlannedOutputModal({
   open: boolean;
   closePlannedOutputModal: () => void;
 }) {
+  const [singleTemplate, setSingleTemplate] =
+    useStorageLinkedString("singleTemplate");
+  const [multiTemplate, setMultiTemplate] =
+    useStorageLinkedString("multiTemplate");
+  const [guaranteeTemplate, setGuaranteeTemplate] =
+    useStorageLinkedString("guaranteeTemplate");
+
   const plannedOutput = plannedOutputRef.current;
-  const collapsedPlanOutput = collapsePlannedOutput(plannedOutput);
-  console.log(collapsedPlanOutput);
+  const collapsedPlannedOutput = collapsePlannedOutput(plannedOutput);
+
+  const plannedOutputText = constructPlannedOutput({
+    collapsedPlannedOutput,
+    singleTemplate,
+    multiTemplate,
+    guaranteeTemplate,
+  });
+  console.log(plannedOutputText);
+
   return (
     <Modal open={open} onClose={closePlannedOutputModal}>
       <Box css={boxCss}>

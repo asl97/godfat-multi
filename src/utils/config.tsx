@@ -7,6 +7,9 @@ const DEFAULTS = {
   count: 100,
   inputKeys: [],
   mode: "simulate",
+  singleTemplate: "S",
+  multiTemplate: "M",
+  guaranteeTemplate: "G",
 };
 
 const URL_INPUT_DEFAULTS = {
