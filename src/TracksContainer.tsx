@@ -370,7 +370,6 @@ export default function TracksContainer({
         selectionOutputs.push(selectionOutput);
       }
       plannedOutputRef.current = selectionOutputs;
-      console.log(plannedOutputRef.current);
     }
   }
 

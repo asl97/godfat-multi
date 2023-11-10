@@ -8,6 +8,7 @@ import { Typography } from "@mui/material";
 import { useGodfatBanners } from "./utils/godfat";
 import { useStorageLinkedString } from "./utils/config";
 import { OutputEntry } from "./utils/output";
+import PlannedOutputModal from "./PlannedOutputModal";
 
 export type BannerData = {
   label: string;
@@ -68,7 +69,10 @@ export default function Page() {
   const resetPlannedCells = () => setPlannedCells([]);
   // This was causing an infinite loop as state, since each rerender would set this to a new array
   // (even if the array is equivalent). We're probably okay just using a ref, lol
-  const plannedOutput = useRef<OutputEntry[]>([]);
+  const plannedOutputRef = useRef<OutputEntry[]>([]);
+  const [plannedOutputModalOpen, setPlannedOutputModalOpen] = useState(false);
+  const openPlannedOutputModal = () => setPlannedOutputModalOpen(true);
+  const closePlannedOutputModal = () => setPlannedOutputModalOpen(false);
 
   const [configData, setConfigData] = useState<ConfigData>({
     bannerData: [],
@@ -85,6 +89,11 @@ export default function Page() {
 
   return (
     <div css={globalCss}>
+      <PlannedOutputModal
+        plannedOutputRef={plannedOutputRef}
+        open={plannedOutputModalOpen}
+        closePlannedOutputModal={closePlannedOutputModal}
+      />
       <ConfigContainer
         banners={banners}
         setConfigData={setConfigData}
@@ -96,6 +105,7 @@ export default function Page() {
         resetSelectedCell={resetSelectedCell}
         resetPlannedCells={resetPlannedCells}
         undoPlannedCell={undoPlannedCell}
+        openPlannedOutputModal={openPlannedOutputModal}
       />
       <TracksContainer
         plannedCells={plannedCells}
@@ -107,7 +117,7 @@ export default function Page() {
         setSelectedCell={setSelectedCell}
         setSeed={setSeedAndForceReload}
         mode={mode}
-        plannedOutputRef={plannedOutput}
+        plannedOutputRef={plannedOutputRef}
       />
     </div>
   );

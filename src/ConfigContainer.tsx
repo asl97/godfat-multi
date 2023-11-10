@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, MutableRefObject, useEffect } from "react";
 import {
   BannerSelectOption,
   augmentGodfatUrlWithGlobalConfig,
@@ -26,6 +26,7 @@ import {
   useStorageLinkedNumber,
   useStorageLinkedString,
 } from "./utils/config";
+import { OutputEntry } from "./utils/output";
 
 const generateKey = () => Math.random().toString(36).substring(7);
 
@@ -47,6 +48,7 @@ export default function ConfigContainer({
   resetSelectedCell,
   resetPlannedCells,
   undoPlannedCell,
+  openPlannedOutputModal,
 }: {
   banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
@@ -58,6 +60,7 @@ export default function ConfigContainer({
   resetSelectedCell: () => void;
   resetPlannedCells: () => void;
   undoPlannedCell: () => void;
+  openPlannedOutputModal: () => void;
 }) {
   const [count, setCount] = useStorageLinkedNumber("count");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
@@ -204,6 +207,19 @@ export default function ConfigContainer({
                   onClick={() => resetPlannedCells()}
                 >
                   Reset
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="success"
+                  css={{
+                    marginLeft: "12px",
+                    marginRight: "4px",
+                    height: "fit-content",
+                  }}
+                  onClick={() => openPlannedOutputModal()}
+                >
+                  Finish
                 </Button>
               </Fragment>
             )}
