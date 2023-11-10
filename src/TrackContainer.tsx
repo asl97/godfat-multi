@@ -140,9 +140,7 @@ export default function TrackContainer({
             <th>No.</th>
             {zippedCells[0].map((_, i) => (
               <th key={i} colSpan={isGuaranteedArray[i] ? 2 : 1}>
-                {Boolean(configData.bannerData[i].label)
-                  ? configData.bannerData[i].label
-                  : "Banner " + (i + 1)}
+                {configData.bannerData[i].label}
               </th>
             ))}
           </StickyRow>

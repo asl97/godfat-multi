@@ -85,7 +85,7 @@ export default function ConfigContainer({
   };
 
   const onSubmit = () => {
-    const bannerData = inputs.map(({ value }) => {
+    const bannerData = inputs.map(({ value }, index) => {
       const augmentedUrl = augmentGodfatUrlWithGlobalConfig({
         startingUrl: value.url,
         seed,
@@ -96,7 +96,7 @@ export default function ConfigContainer({
         banners,
       });
       return {
-        label: value.label,
+        label: value.label || `Banner ${index + 1}`,
         url: sanitizedUrl,
       };
     });

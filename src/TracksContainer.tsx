@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { MutableRefObject, useEffect, useState } from "react";
 
 import TrackContainer from "./TrackContainer";
 import { ConfigData } from "./Page";
@@ -8,6 +8,11 @@ import { Typography } from "@mui/material";
 import { CatCell, CatData, extractCatsFromTable } from "./utils/godfatParsing";
 import { BannerSelectOption, urlToRareCatQueryUrl } from "./utils/godfat";
 import { desSelectedCell } from "./utils/cellSelection";
+import {
+  OutputEntry,
+  OutputEntryGuarantee,
+  OutputEntrySingle,
+} from "./utils/output";
 
 export type CellData = {
   row: string;
@@ -17,6 +22,10 @@ export type CellData = {
 type QueryData = {
   trackAs: CatCell[][];
   trackBs: CatCell[][];
+};
+
+const parseSeedFromHref = (href: string) => {
+  return new URL(href).searchParams.get("seed") || "";
 };
 
 const handleCellSelection = ({
@@ -33,7 +42,7 @@ const handleCellSelection = ({
   configData: ConfigData;
   rareCats: Set<string>;
   highlightNext: boolean;
-}) => {
+}): OutputEntry => {
   const { bannerUrl, num, track, isMainCat, isGuaranteed } =
     desSelectedCell(selectedCell);
 
@@ -56,7 +65,15 @@ const handleCellSelection = ({
     track === "A"
       ? queryData.trackAs[trackIndex]
       : queryData.trackBs[trackIndex];
+  const outputEntry: OutputEntry = {
+    bannerLabel: configData.bannerData[trackIndex].label,
+  };
+  const outputEntrySingle: Partial<OutputEntrySingle> = {};
+  const outputEntryGuarantee: Partial<OutputEntryGuarantee> = {
+    trackCatNames: [],
+  };
 
+  // Seed outputEntry with some initial values
   // If the cell is a guaranteed, highlight it and find the destination
   let guaranteedDestinationNum = null;
   let guaranteedDestinationTrack = null;
@@ -68,12 +85,26 @@ const handleCellSelection = ({
         currentCatCell.guaranteeMainCat?.destinationRow;
       guaranteedDestinationTrack =
         currentCatCell.guaranteeMainCat?.destinationTrack;
+      outputEntryGuarantee.guaranteeCatName =
+        currentCatCell.guaranteeMainCat!.name;
+      outputEntryGuarantee.nextSeed = parseSeedFromHref(
+        currentCatCell.guaranteeMainCat!.href
+      );
     } else {
       setCellBackground(currentCatCell.guaranteeAltCat!, "selected");
       guaranteedDestinationNum = currentCatCell.guaranteeAltCat?.destinationRow;
       guaranteedDestinationTrack =
         currentCatCell.guaranteeAltCat?.destinationTrack;
+      outputEntryGuarantee.guaranteeCatName =
+        currentCatCell.guaranteeAltCat!.name;
+      outputEntryGuarantee.nextSeed = parseSeedFromHref(
+        currentCatCell.guaranteeAltCat!.href
+      );
     }
+    outputEntryGuarantee.startNum = num;
+    outputEntryGuarantee.startTrack = track;
+    outputEntryGuarantee.nextNum = guaranteedDestinationNum;
+    outputEntryGuarantee.nextTrack = guaranteedDestinationTrack;
   }
 
   // If not main cat, set lastCatName to a dupe to force the alt track
@@ -99,10 +130,22 @@ const handleCellSelection = ({
       currentCatCell.mainCat.name === lastCatName;
     if (!isRareDupe) {
       lastCatName = currentCatCell.mainCat.name;
+
+      if (!isGuaranteed) {
+        outputEntrySingle.num = currentNum;
+        outputEntrySingle.track = currentTrack;
+      }
+
       currentNum += 1;
       currentCat = currentCatCell.mainCat;
     } else {
       lastCatName = currentCatCell.altCat!.name;
+
+      if (!isGuaranteed) {
+        outputEntrySingle.num = currentNum;
+        outputEntrySingle.track = currentTrack;
+      }
+
       currentNum = currentCatCell.altCat!.destinationRow;
       currentTrack = currentCatCell.altCat!.destinationTrack as "A" | "B";
       currentCat = currentCatCell.altCat!;
@@ -110,6 +153,13 @@ const handleCellSelection = ({
     // Highlight the cat
     setCellBackground(currentCat, "selected");
     numRolls += 1;
+
+    // Update outputEntry
+    if (isGuaranteed) {
+      outputEntryGuarantee.trackCatNames!.push(currentCat.name);
+    } else {
+      outputEntrySingle.catName = currentCat.name;
+    }
 
     // Exit conditions
     if (isGuaranteed) {
@@ -123,10 +173,17 @@ const handleCellSelection = ({
           currentTrack === "A")
       ) {
         break;
+      } else {
+        // Kinda hacky - just keep updating endNum/endTrack every loop until the stop condition
+        outputEntryGuarantee.endNum = currentNum;
+        outputEntryGuarantee.endTrack = currentTrack;
       }
     } else {
       // For non-guaranteed cells, just stop after one pull
       if (numRolls === 1) {
+        outputEntrySingle.nextNum = currentNum;
+        outputEntrySingle.nextTrack = currentTrack;
+        outputEntrySingle.nextSeed = parseSeedFromHref(currentCat.href);
         break;
       }
     }
@@ -158,6 +215,13 @@ const handleCellSelection = ({
       }
     }
   }
+
+  if (isGuaranteed) {
+    outputEntry.guarantee = outputEntryGuarantee as OutputEntryGuarantee;
+  } else {
+    outputEntry.single = outputEntrySingle as OutputEntrySingle;
+  }
+  return outputEntry;
 };
 
 export default function TracksContainer({
@@ -170,6 +234,7 @@ export default function TracksContainer({
   addPlannedCell,
   resetPlannedCells,
   mode,
+  plannedOutputRef,
 }: {
   banners: BannerSelectOption[];
   configData: ConfigData;
@@ -180,6 +245,7 @@ export default function TracksContainer({
   addPlannedCell: (cell: string) => void;
   resetPlannedCells: () => void;
   mode: string;
+  plannedOutputRef: MutableRefObject<OutputEntry[]>;
 }) {
   const urls = configData.bannerData.map((data) => data.url);
   const [parsedQueryData, setParsedQueryData] = useState<QueryData>({
@@ -291,8 +357,9 @@ export default function TracksContainer({
         }
       }
     } else {
+      const selectionOutputs = [];
       for (const [index, plannedCell] of plannedCells.entries()) {
-        handleCellSelection({
+        const selectionOutput = handleCellSelection({
           mode,
           queryData,
           selectedCell: plannedCell,
@@ -300,7 +367,10 @@ export default function TracksContainer({
           rareCats,
           highlightNext: index === plannedCells.length - 1,
         });
+        selectionOutputs.push(selectionOutput);
       }
+      plannedOutputRef.current = selectionOutputs;
+      console.log(plannedOutputRef.current);
     }
   }
 

@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { jsx, css } from "@emotion/react";
 
 import ConfigContainer from "./ConfigContainer";
@@ -7,6 +7,7 @@ import TracksContainer from "./TracksContainer";
 import { Typography } from "@mui/material";
 import { useGodfatBanners } from "./utils/godfat";
 import { useStorageLinkedString } from "./utils/config";
+import { OutputEntry } from "./utils/output";
 
 export type BannerData = {
   label: string;
@@ -65,8 +66,11 @@ export default function Page() {
   const undoPlannedCell = () =>
     setPlannedCells((plannedCells) => plannedCells.slice(0, -1));
   const resetPlannedCells = () => setPlannedCells([]);
+  // This was causing an infinite loop as state, since each rerender would set this to a new array
+  // (even if the array is equivalent). We're probably okay just using a ref, lol
+  const plannedOutput = useRef<OutputEntry[]>([]);
 
-  const [configData, setConfigData] = React.useState<ConfigData>({
+  const [configData, setConfigData] = useState<ConfigData>({
     bannerData: [],
   });
 
@@ -103,6 +107,7 @@ export default function Page() {
         setSelectedCell={setSelectedCell}
         setSeed={setSeedAndForceReload}
         mode={mode}
+        plannedOutputRef={plannedOutput}
       />
     </div>
   );
