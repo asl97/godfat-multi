@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React from "react";
+import React, { useState } from "react";
 import { Box, Modal, Typography } from "@mui/material";
 import { css, jsx } from "@emotion/react";
 import { MutableRefObject } from "react";
@@ -91,12 +91,10 @@ export default function PlannedOutputModal({
   open: boolean;
   closePlannedOutputModal: () => void;
 }) {
-  const [singleTemplate, setSingleTemplate] =
-    useStorageLinkedString("singleTemplate");
-  const [multiTemplate, setMultiTemplate] =
-    useStorageLinkedString("multiTemplate");
+  const [singleTemplate, setSingleTemplate] = useState("singleTemplate");
+  const [multiTemplate, setMultiTemplate] = useState("multiTemplate");
   const [guaranteeTemplate, setGuaranteeTemplate] =
-    useStorageLinkedString("guaranteeTemplate");
+    useState("guaranteeTemplate");
 
   const plannedOutput = plannedOutputRef.current;
   const collapsedPlannedOutput = collapsePlannedOutput(plannedOutput);
