@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { BannerData } from "../Page";
+import {
+  DEFAULT_GUARANTEE_TEMPLATE,
+  DEFAULT_MULTI_TEMPLATE,
+  DEFAULT_SINGLE_TEMPLATE,
+} from "../PlannedOutputModal";
 
 const DEFAULTS = {
   seed: "",
@@ -7,6 +12,9 @@ const DEFAULTS = {
   count: 100,
   inputKeys: [],
   mode: "simulate",
+  singleTemplate: DEFAULT_SINGLE_TEMPLATE,
+  multiTemplate: DEFAULT_MULTI_TEMPLATE,
+  guaranteeTemplate: DEFAULT_GUARANTEE_TEMPLATE,
 };
 
 const URL_INPUT_DEFAULTS = {

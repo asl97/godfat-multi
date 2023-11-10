@@ -219,7 +219,7 @@ export default function ConfigContainer({
                   }}
                   onClick={() => openPlannedOutputModal()}
                 >
-                  Finish
+                  Output
                 </Button>
               </Fragment>
             )}
