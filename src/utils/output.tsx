@@ -21,6 +21,6 @@ export type OutputEntryGuarantee = {
 
 export type OutputEntry = {
   bannerLabel: string;
-  single?: Partial<OutputEntrySingle>;
-  guarantee?: Partial<OutputEntryGuarantee>;
+  single?: OutputEntrySingle;
+  guarantee?: OutputEntryGuarantee;
 };
