@@ -1,5 +1,11 @@
 /** @jsx jsx */
-import React, { Fragment, MutableRefObject, useEffect } from "react";
+import React, {
+  Fragment,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   BannerSelectOption,
   augmentGodfatUrlWithGlobalConfig,
@@ -41,8 +47,7 @@ export default function ConfigContainer({
   banners,
   setConfigData,
   seed,
-  setSeed,
-  forceReload,
+  setSeedWithOptionalReload,
   mode,
   setMode,
   resetSelectedCell,
@@ -53,8 +58,7 @@ export default function ConfigContainer({
   banners: BannerSelectOption[];
   setConfigData: (data: ConfigData) => void;
   seed: string;
-  setSeed: (seed: string) => void;
-  forceReload: number;
+  setSeedWithOptionalReload: (seed: string, reload: boolean) => void;
   mode: string;
   setMode: (mode: string) => void;
   resetSelectedCell: () => void;
@@ -64,6 +68,7 @@ export default function ConfigContainer({
 }) {
   const [count, setCount] = useStorageLinkedNumber("count");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
+  const [userInputSeed, setUserInputSeed] = useState(seed);
 
   const addNewInput = () => {
     setInputs((inputs) => [
@@ -88,10 +93,13 @@ export default function ConfigContainer({
   };
 
   const onSubmit = () => {
+    setSeedWithOptionalReload(userInputSeed, false);
     const bannerData = inputs.map(({ value }, index) => {
       const augmentedUrl = augmentGodfatUrlWithGlobalConfig({
         startingUrl: value.url,
-        seed,
+        // Take note of this line - seed might not be synced with userInputSeed
+        // until the next render cycle, so we use userInputSeed directly instead
+        seed: userInputSeed,
         count,
       });
       const sanitizedUrl = sanitizeGodfatUrl({
@@ -106,11 +114,15 @@ export default function ConfigContainer({
     setConfigData({ bannerData });
   };
 
-  useEffect(() => {
+  // Hack: the first render is doesn't have the inputs yet, only the input keys
+  // The second render will be triggered instantly by the inputs instantiating themselves
+  const numRendersRef = useRef(0);
+  numRendersRef.current += 1;
+  if (numRendersRef.current === 2 && seed) {
     try {
       onSubmit();
     } catch (e) {}
-  }, [forceReload]);
+  }
 
   return (
     <div>
@@ -121,9 +133,9 @@ export default function ConfigContainer({
           label="Gacha seed"
           placeholder="123456..."
           variant="outlined"
-          value={seed}
+          value={userInputSeed}
           onChange={(event) => {
-            setSeed(event.target.value);
+            setUserInputSeed(event.target.value);
           }}
           error={isNaN(Number(seed)) || Number(seed) === 0}
         />

@@ -229,7 +229,6 @@ export default function PlannedOutputModal({
     multiTemplate,
     guaranteeTemplate,
   });
-  console.log(plannedOutputText);
 
   return (
     <Modal open={open} onClose={closePlannedOutputModal}>

@@ -107,3 +107,25 @@ export const useStorageLinkedInputs = (
   };
   return [inputs, linkedSetInputs];
 };
+
+export const useQueryParamLinkedString = (
+  key: string
+): [string, (value: string, reload: boolean) => void] => {
+  const initialUrl = new URL(window.location.href);
+  let initialValue = (DEFAULTS[key as keyof typeof DEFAULTS] as string) ?? "";
+  if (initialUrl.searchParams.has(key)) {
+    initialValue = initialUrl.searchParams.get(key) as string;
+  }
+  const [value, setValue] = useState(initialValue);
+  const linkedSetValue = (value: string, reload: boolean) => {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set(key, value);
+    if (reload) {
+      window.location.href = currentUrl.href;
+    } else {
+      window.history.replaceState({}, "", currentUrl.href);
+      setValue(value);
+    }
+  };
+  return [value, linkedSetValue];
+};

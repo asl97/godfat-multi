@@ -6,7 +6,10 @@ import ConfigContainer from "./ConfigContainer";
 import TracksContainer from "./TracksContainer";
 import { Typography } from "@mui/material";
 import { useGodfatBanners } from "./utils/godfat";
-import { useStorageLinkedString } from "./utils/config";
+import {
+  useQueryParamLinkedString,
+  useStorageLinkedString,
+} from "./utils/config";
 import { OutputEntry } from "./utils/output";
 import PlannedOutputModal from "./PlannedOutputModal";
 
@@ -49,13 +52,9 @@ const globalCss = css`
 
 export default function Page() {
   // This is modified in TracksContainer when clicking to update seed, so it's pulled out to this level
-  const [seed, setSeed] = useStorageLinkedString("seed");
-  // We don't want to reload the track UNLESS the change is from within the track
-  const [forceReload, setForceReload] = useState(0);
-  const setSeedAndForceReload = (seed: string) => {
-    setSeed(seed);
-    setForceReload((forceReload) => forceReload + 1);
-  };
+  const [seed, setSeedWithOptionalReload] = useQueryParamLinkedString("seed");
+  const setSeedWithReload = (seed: string) =>
+    setSeedWithOptionalReload(seed, true);
 
   const [mode, setMode] = useStorageLinkedString("mode");
   const [selectedCell, setSelectedCell] = useState("");
@@ -98,8 +97,7 @@ export default function Page() {
         banners={banners}
         setConfigData={setConfigData}
         seed={seed}
-        setSeed={setSeed}
-        forceReload={forceReload}
+        setSeedWithOptionalReload={setSeedWithOptionalReload}
         mode={mode}
         setMode={setMode}
         resetSelectedCell={resetSelectedCell}
@@ -115,7 +113,7 @@ export default function Page() {
         configData={configData}
         selectedCell={selectedCell}
         setSelectedCell={setSelectedCell}
-        setSeed={setSeedAndForceReload}
+        setSeed={setSeedWithReload}
         mode={mode}
         plannedOutputRef={plannedOutputRef}
       />
