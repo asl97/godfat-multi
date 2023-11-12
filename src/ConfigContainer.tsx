@@ -265,11 +265,17 @@ export default function ConfigContainer({
           setSelfValue={(value) => setInputValue(key, value)}
         />
       ))}
-      <Row>
-        <Button variant="contained" disableElevation onClick={() => onSubmit()}>
-          Submit / Update
-        </Button>
-      </Row>
+      {inputs.length > 0 && (
+        <Row>
+          <Button
+            variant="contained"
+            disableElevation
+            onClick={() => onSubmit()}
+          >
+            Submit / Update
+          </Button>
+        </Row>
+      )}
     </div>
   );
 }
