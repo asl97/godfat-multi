@@ -69,6 +69,8 @@ export default function ConfigContainer({
   const [count, setCount] = useStorageLinkedNumber("count");
   const [inputs, setInputs] = useStorageLinkedInputs("inputKeys");
   const [userInputSeed, setUserInputSeed] = useState(seed);
+  const userInputSeedIsValid =
+    !isNaN(Number(userInputSeed)) && Number(userInputSeed) !== 0;
 
   const addNewInput = () => {
     setInputs((inputs) => [
@@ -137,7 +139,7 @@ export default function ConfigContainer({
           onChange={(event) => {
             setUserInputSeed(event.target.value);
           }}
-          error={isNaN(Number(userInputSeed)) || Number(userInputSeed) === 0}
+          error={!userInputSeedIsValid}
         />
         <FormControl>
           <InputLabel id="count-select" shrink>
@@ -265,7 +267,7 @@ export default function ConfigContainer({
           setSelfValue={(value) => setInputValue(key, value)}
         />
       ))}
-      {inputs.length > 0 && (
+      {inputs.length > 0 && userInputSeedIsValid && (
         <Row>
           <Button
             variant="contained"
