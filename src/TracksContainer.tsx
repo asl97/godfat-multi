@@ -248,6 +248,10 @@ export default function TracksContainer({
   plannedOutputRef: MutableRefObject<OutputEntry[]>;
 }) {
   const urls = configData.bannerData.map((data) => data.url);
+  // We want to render tracks when the urls change, but we can't use urls in the dependency array since its
+  // identity is different every rerender. Hence, we use the stringified version instead:
+  const urlsButAsAString = urls.join("");
+
   const [parsedQueryData, setParsedQueryData] = useState<QueryData>({
     trackAs: [],
     trackBs: [],
@@ -319,7 +323,7 @@ export default function TracksContainer({
     })();
 
     return () => {};
-  }, [allQueriesResolved, queries.length, rareCatQueries.length]); // TODO fix this?
+  }, [allQueriesResolved, urlsButAsAString]);
 
   if (!allQueriesResolved) {
     return <Typography variant="h5">Loading banner data...</Typography>;
