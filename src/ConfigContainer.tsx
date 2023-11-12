@@ -137,7 +137,7 @@ export default function ConfigContainer({
           onChange={(event) => {
             setUserInputSeed(event.target.value);
           }}
-          error={isNaN(Number(seed)) || Number(seed) === 0}
+          error={isNaN(Number(userInputSeed)) || Number(userInputSeed) === 0}
         />
         <FormControl>
           <InputLabel id="count-select" shrink>
