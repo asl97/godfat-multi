@@ -23,11 +23,11 @@ import { Cached } from "@mui/icons-material";
 import { useStorageLinkedString } from "./utils/config";
 
 export const DEFAULT_SINGLE_TEMPLATE =
-  "$POS.FIRST: 1x on $BANNER for $CATS.FIRST, next pull is $POS.NEXT ($NEWSEED)";
+  "$POS.FIRST: 1x on **$BANNER** for $CATS.FIRST, next pull is $POS.NEXT (*$NEWSEED*)";
 export const DEFAULT_MULTI_TEMPLATE =
-  "$POS.FIRST-$POS.LAST: $CATS.COUNTx on $BANNER for $CATS.FIRST - $CATS.LAST, next pull is $POS.NEXT ($NEWSEED)";
+  "$POS.FIRST-$POS.LAST: $CATS.COUNTx on **$BANNER** for $CATS.FIRST - $CATS.LAST, next pull is $POS.NEXT (*$NEWSEED*)";
 export const DEFAULT_GUARANTEE_TEMPLATE =
-  "$POS.FIRST-$POS.LAST: Guaranteed $CATS.COUNTx on $BANNER for $CATS.FIRST - $CATS.LAST (+ $CATS.G), next pull is $POS.NEXT ($NEWSEED)";
+  "$POS.FIRST-$POS.LAST: Guaranteed $CATS.COUNTx on **$BANNER** for $CATS.FIRST - $CATS.LAST (+ $CATS.G), next pull is $POS.NEXT (*$NEWSEED*)";
 
 const HIGHLIGHT_ARRAY = [
   {
