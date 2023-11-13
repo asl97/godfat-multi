@@ -3,13 +3,14 @@ import React, { useState } from "react";
 import { jsx, css } from "@emotion/react";
 import { Box, Modal, Typography } from "@mui/material";
 
-const CURRENT_VERSION = "1.1.1";
+const CURRENT_VERSION = "1.2.0";
 
 const UPDATES = [
   [
     CURRENT_VERSION,
-    "Added icons to planning buttons, updated default templates",
+    "The planning mode controls now float at the bottom right of the screen when you scroll down",
   ],
+  ["1.1.1", "Added icons to planning buttons, updated default templates"],
   ["1.1.0", "Added version update dialog"],
   ["1.0.0", "Initial release (beginning of version history)"],
 ];
@@ -80,7 +81,7 @@ export default function VersionUpdateModal() {
         <ul css={{ margin: 0 }}>
           {newUpdates.map(([version, update]) => (
             <li key={version}>
-              <Typography variant="caption">
+              <Typography variant="caption" component="div" lineHeight="1.5em">
                 <strong>v{version}</strong>: {update}
               </Typography>
             </li>
@@ -93,7 +94,11 @@ export default function VersionUpdateModal() {
           <ul css={{ margin: 0 }}>
             {seenUpdates.map(([version, update]) => (
               <li key={version}>
-                <Typography variant="caption">
+                <Typography
+                  variant="caption"
+                  component="div"
+                  lineHeight="1.5em"
+                >
                   <strong>v{version}</strong>: {update}
                 </Typography>
               </li>
