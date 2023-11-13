@@ -33,6 +33,13 @@ import {
   useStorageLinkedString,
 } from "./utils/config";
 import { OutputEntry } from "./utils/output";
+import {
+  Assignment,
+  ContentPasteGo,
+  Delete,
+  DeleteForever,
+  Undo,
+} from "@mui/icons-material";
 
 const generateKey = () => Math.random().toString(36).substring(7);
 
@@ -206,6 +213,7 @@ export default function ConfigContainer({
             {mode === "plan" && (
               <Fragment>
                 <Button
+                  startIcon={<Undo />}
                   variant="outlined"
                   size="small"
                   css={{ marginLeft: "12px", height: "fit-content" }}
@@ -214,6 +222,7 @@ export default function ConfigContainer({
                   Undo
                 </Button>
                 <Button
+                  startIcon={<Delete />}
                   variant="outlined"
                   size="small"
                   color="error"
@@ -223,6 +232,7 @@ export default function ConfigContainer({
                   Reset
                 </Button>
                 <Button
+                  startIcon={<ContentPasteGo />}
                   variant="outlined"
                   size="small"
                   color="success"
