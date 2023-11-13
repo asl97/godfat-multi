@@ -3,11 +3,15 @@ import React, { useState } from "react";
 import { jsx, css } from "@emotion/react";
 import { Box, Modal, Typography } from "@mui/material";
 
-const CURRENT_VERSION = "1.2.0";
+const CURRENT_VERSION = "1.2.1";
 
 const UPDATES = [
   [
     CURRENT_VERSION,
+    "Planning mode now disables clicking cat names to update the seed",
+  ],
+  [
+    "1.2.0",
     "The planning mode controls now float at the bottom right of the screen when you scroll down",
   ],
   ["1.1.1", "Added icons to planning buttons, updated default templates"],

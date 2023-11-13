@@ -316,7 +316,8 @@ export default function ConfigContainer({
               {mode === "plan" ? (
                 <i>
                   (clicking <strong>striped</strong> cells will{" "}
-                  <strong>continue the chain</strong>)
+                  <strong>continue the chain</strong>, also{" "}
+                  <strong>disables clicking cat names</strong>)
                 </i>
               ) : (
                 <i>

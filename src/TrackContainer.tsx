@@ -82,9 +82,11 @@ const StickyRow = styled.tr`
 `;
 
 const CatAnchor = ({
+  mode,
   cat,
   setSeed,
 }: {
+  mode: string;
   cat?: {
     text: string;
     href: string;
@@ -93,6 +95,9 @@ const CatAnchor = ({
 }) => {
   if (!cat) {
     return null;
+  }
+  if (mode === "plan") {
+    return <span>{cat.text}</span>;
   }
   return (
     <a
@@ -196,11 +201,13 @@ export default function TrackContainer({
                         >
                           {isTrackSwitchCell ? (
                             <CatAnchor
+                              mode={mode}
                               cat={catCell.mainCat}
                               setSeed={setSeed}
                             ></CatAnchor>
                           ) : (
                             <CatAnchor
+                              mode={mode}
                               cat={catCell.altCat}
                               setSeed={setSeed}
                             ></CatAnchor>
@@ -236,11 +243,13 @@ export default function TrackContainer({
                           >
                             {isTrackSwitchCell ? (
                               <CatAnchor
+                                mode={mode}
                                 cat={catCell.guaranteeMainCat}
                                 setSeed={setSeed}
                               ></CatAnchor>
                             ) : (
                               <CatAnchor
+                                mode={mode}
                                 cat={catCell.guaranteeAltCat}
                                 setSeed={setSeed}
                               ></CatAnchor>
@@ -293,11 +302,13 @@ export default function TrackContainer({
                         >
                           {isTrackSwitchCell ? (
                             <CatAnchor
+                              mode={mode}
                               cat={catCell.altCat}
                               setSeed={setSeed}
                             ></CatAnchor>
                           ) : (
                             <CatAnchor
+                              mode={mode}
                               cat={catCell.mainCat}
                               setSeed={setSeed}
                             ></CatAnchor>
@@ -339,11 +350,13 @@ export default function TrackContainer({
                           >
                             {isTrackSwitchCell ? (
                               <CatAnchor
+                                mode={mode}
                                 cat={catCell.guaranteeAltCat}
                                 setSeed={setSeed}
                               ></CatAnchor>
                             ) : (
                               <CatAnchor
+                                mode={mode}
                                 cat={catCell.guaranteeMainCat}
                                 setSeed={setSeed}
                               ></CatAnchor>
