@@ -12,6 +12,7 @@ import {
 } from "./utils/config";
 import { OutputEntry } from "./utils/output";
 import PlannedOutputModal from "./PlannedOutputModal";
+import VersionUpdateModal from "./VersionUpdateModal";
 
 export type BannerData = {
   label: string;
@@ -88,6 +89,7 @@ export default function Page() {
 
   return (
     <div css={globalCss}>
+      <VersionUpdateModal />
       <PlannedOutputModal
         plannedOutputRef={plannedOutputRef}
         open={plannedOutputModalOpen}
