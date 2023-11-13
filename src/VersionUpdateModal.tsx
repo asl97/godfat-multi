@@ -3,10 +3,14 @@ import React, { useState } from "react";
 import { jsx, css } from "@emotion/react";
 import { Box, Modal, Typography } from "@mui/material";
 
-const CURRENT_VERSION = "1.1.0";
+const CURRENT_VERSION = "1.1.1";
 
 const UPDATES = [
-  [CURRENT_VERSION, "Added version update dialog"],
+  [
+    CURRENT_VERSION,
+    "Added icons to planning buttons, updated default templates",
+  ],
+  ["1.1.0", "Added version update dialog"],
   ["1.0.0", "Initial release (beginning of version history)"],
 ];
 
