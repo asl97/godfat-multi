@@ -201,6 +201,7 @@ const handleCellSelection = ({
       const catCell = track[nextCatNum! - 1];
       if (catCell) {
         const isRareDupe =
+          !isGuaranteed &&
           rareCats.has(catCell.mainCat.name) &&
           catCell.mainCat.name === lastCatName;
         if (!isRareDupe) {
