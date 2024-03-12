@@ -36,10 +36,15 @@ const parseBannersFromHtml = (html: Document): BannerSelectOption[] => {
 };
 
 export const useGodfatBanners = () => {
+  // 12/03/2024: For some reason corsproxy is caching an old version of
+  // the base godfat page. As a temporary workaround, appending a fixed seed
+  // of 1 to bust the cache. If issue persists, could consider generating
+  // a random fixed seed instead.
+  const BASE_GODFAT_URL_WITH_FIXED_SEED = `${BASE_GODFAT_URL}?seed=1`;
   const [banners, setBanners] = useState<BannerSelectOption[]>([]);
   const bannerQuery = useQuery({
-    queryKey: [BASE_GODFAT_URL],
-    queryFn: () => fetch(corsUrl(BASE_GODFAT_URL)),
+    queryKey: [BASE_GODFAT_URL_WITH_FIXED_SEED],
+    queryFn: () => fetch(corsUrl(BASE_GODFAT_URL_WITH_FIXED_SEED)),
     staleTime: Infinity,
   });
 
