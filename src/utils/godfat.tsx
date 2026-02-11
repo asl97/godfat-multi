@@ -176,7 +176,7 @@ export const sanitizeGodfatUrl = ({
     }
   }
   const sortedUpdatedParams = `/?${updatedParams.join("&")}`;
-  return `${url.origin}${sortedUpdatedParams}&`;
+  return `${url.origin}${sortedUpdatedParams}`;
 };
 
 export const urlToRareCatQueryUrl = ({
